@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Sign Up – Randhawa SkyCast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:  #0d0020;
+      --purple-light: #a855f7;
+      --purple-pale:  #d8b4fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --text-soft:    #e9d5ff;
+      --card-bg:      rgba(42,0,80,0.6);
+      --border:       rgba(168,85,247,0.28);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Nunito',sans-serif; background:var(--purple-deep); color:#fff; min-height:100vh; overflow-x:hidden; }
+ 
+    .bg-fixed { position:fixed; inset:0; z-index:0; background:linear-gradient(160deg,#08000f 0%,#1e0040 35%,#4a0090 65%,#7a3500 88%,#b05000 100%); }
+    .bg-orb   { position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:1; }
+    .orb-1    { width:700px; height:700px; background:radial-gradient(#7c3aed44,transparent 70%); top:-200px; left:-200px; }
+    .orb-2    { width:500px; height:500px; background:radial-gradient(#f59e0b30,transparent 70%); bottom:-150px; right:-150px; }
+    .orb-3    { width:400px; height:400px; background:radial-gradient(#a855f722,transparent 70%); top:40%; left:50%; transform:translateX(-50%); }
+ 
+    /* LAYOUT */
+    .page-wrap { position:relative; z-index:10; min-height:100vh; display:grid; grid-template-columns:1fr 1fr; }
+    @media(max-width:860px){ .page-wrap{grid-template-columns:1fr;} .left-panel{display:none;} }
+ 
+    /* LEFT PANEL */
+    .left-panel { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:4rem 3rem; text-align:center; border-right:1px solid rgba(168,85,247,0.15); position:relative; overflow:hidden; }
+    .left-panel::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(106,0,184,0.2),rgba(245,158,11,0.05)); }
+    .left-logo { width:180px; margin-bottom:2rem; filter:drop-shadow(0 0 40px rgba(168,85,247,0.9)) drop-shadow(0 0 15px rgba(245,158,11,0.5)); animation:float 4s ease-in-out infinite; position:relative; z-index:1; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    .left-title { font-family:'Cinzel Decorative',serif; font-size:1.8rem; background:linear-gradient(135deg,#e9d5ff,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:1rem; position:relative; z-index:1; }
+    .left-desc  { color:var(--text-soft); font-size:0.95rem; line-height:1.8; max-width:340px; position:relative; z-index:1; }
+    .left-features { margin-top:2.5rem; display:flex; flex-direction:column; gap:1rem; width:100%; max-width:320px; position:relative; z-index:1; }
+    .left-feat { display:flex; align-items:center; gap:1rem; background:rgba(42,0,80,0.5); border:1px solid rgba(168,85,247,0.2); border-radius:12px; padding:0.9rem 1.2rem; text-align:left; }
+    .left-feat-icon { font-size:1.5rem; flex-shrink:0; }
+    .left-feat-text { font-size:0.85rem; color:var(--text-soft); line-height:1.5; }
+    .left-feat-text strong { color:#fff; display:block; }
+ 
+    /* RIGHT PANEL */
+    .right-panel { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:3rem 2rem; }
+    .auth-box { width:100%; max-width:440px; animation:fadeUp 0.7s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+ 
+    .back-link { display:inline-flex; align-items:center; gap:0.4rem; color:rgba(216,180,254,0.5); text-decoration:none; font-size:0.82rem; font-weight:700; margin-bottom:2rem; transition:color 0.2s; }
+    .back-link:hover { color:var(--gold-light); }
+ 
+    /* TABS */
+    .tabs { display:flex; background:rgba(42,0,80,0.5); border:1px solid var(--border); border-radius:16px; padding:5px; margin-bottom:2rem; gap:4px; }
+    .tab-btn { flex:1; padding:0.75rem; border:none; background:transparent; color:rgba(216,180,254,0.55); font-family:'Nunito',sans-serif; font-size:0.95rem; font-weight:800; cursor:pointer; border-radius:12px; transition:all 0.25s; }
+    .tab-btn.active { background:linear-gradient(135deg,#7c3aed,#f59e0b); color:#fff; box-shadow:0 4px 16px rgba(124,58,237,0.4); }
+ 
+    /* FORM CARD */
+    .form-card { background:var(--card-bg); border:1px solid var(--border); border-radius:20px; padding:2.2rem 2rem; backdrop-filter:blur(16px); box-shadow:0 20px 60px rgba(42,0,80,0.5); }
+    .form-title { font-family:'Cinzel Decorative',serif; font-size:1.3rem; background:linear-gradient(90deg,#e9d5ff,#fcd34d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:0.3rem; }
+    .form-sub   { color:var(--text-soft); font-size:0.88rem; margin-bottom:1.8rem; line-height:1.6; }
+ 
+    /* BACK TO LOGIN inside forgot */
+    .back-to-login { display:inline-flex; align-items:center; gap:0.4rem; color:rgba(216,180,254,0.55); font-size:0.82rem; font-weight:700; cursor:pointer; margin-bottom:1.5rem; transition:color 0.2s; background:none; border:none; padding:0; font-family:'Nunito',sans-serif; }
+    .back-to-login:hover { color:var(--gold-light); }
+ 
+    /* TOAST */
+    .toast { display:none; align-items:center; gap:0.6rem; border-radius:10px; padding:0.75rem 1rem; font-size:0.88rem; font-weight:700; margin-bottom:1.2rem; }
+    .toast.success { display:flex; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3); color:#6ee7b7; }
+    .toast.error   { display:flex; background:rgba(239,68,68,0.1);  border:1px solid rgba(239,68,68,0.28); color:#fca5a5; }
+ 
+    /* FIELDS */
+    .field { margin-bottom:1.1rem; }
+    .field-label { display:block; font-size:0.75rem; font-weight:800; color:var(--purple-pale); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.45rem; }
+    .field-wrap  { position:relative; }
+    .field-input { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid rgba(168,85,247,0.3); border-radius:12px; padding:0.85rem 1.1rem; color:#fff; font-family:'Nunito',sans-serif; font-size:0.95rem; outline:none; transition:border-color 0.25s,background 0.25s; }
+    .field-input::placeholder { color:rgba(216,180,254,0.35); }
+    .field-input:focus { border-color:var(--purple-light); background:rgba(168,85,247,0.1); }
+ 
+    .pwd-toggle { position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; color:rgba(216,180,254,0.45); cursor:pointer; font-size:1rem; padding:0; }
+ 
+    /* PASSWORD STRENGTH */
+    .pwd-strength  { margin-top:0.5rem; }
+    .pwd-bar-wrap  { height:4px; background:rgba(168,85,247,0.15); border-radius:4px; overflow:hidden; }
+    .pwd-bar       { height:100%; width:0%; border-radius:4px; transition:width 0.3s,background 0.3s; }
+    .pwd-hint      { font-size:0.72rem; color:rgba(216,180,254,0.45); margin-top:0.3rem; }
+ 
+    /* FORGOT LINK */
+    .forgot-link   { text-align:right; margin:-0.5rem 0 1rem; }
+    .forgot-link a { font-size:0.8rem; color:rgba(216,180,254,0.5); text-decoration:none; cursor:pointer; transition:color 0.2s; }
+    .forgot-link a:hover { color:var(--gold-light); }
+ 
+    /* SUBMIT */
+    .submit-btn { width:100%; background:linear-gradient(135deg,#7c3aed,#f59e0b); color:#fff; border:none; border-radius:12px; padding:1rem; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:900; cursor:pointer; box-shadow:0 8px 28px rgba(124,58,237,0.4); transition:transform 0.2s; margin-top:0.5rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+    .submit-btn:hover    { transform:translateY(-2px); }
+    .submit-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+ 
+    /* SWITCH + TERMS */
+    .switch-link   { text-align:center; font-size:0.88rem; color:rgba(216,180,254,0.5); margin-top:1.2rem; }
+    .switch-link a { color:var(--gold-light); font-weight:800; text-decoration:none; cursor:pointer; }
+    .switch-link a:hover { text-decoration:underline; }
+    .terms-note   { font-size:0.75rem; color:rgba(216,180,254,0.35); text-align:center; margin-top:1rem; line-height:1.6; }
+    .terms-note a { color:rgba(216,180,254,0.55); text-decoration:none; }
+ 
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-fixed"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+ 
+<div class="page-wrap">
+ 
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <img src="logo.png" alt="SkyCast Logo" class="left-logo" onerror="this.style.display='none'"/>
+    <div class="left-title">Randhawa SkyCast</div>
+    <p class="left-desc">Your personal sky companion. Track live weather for every place you care about — all in one dashboard.</p>
+    <div class="left-features">
+      <div class="left-feat"><span class="left-feat-icon">📍</span><div class="left-feat-text"><strong>Unlimited Locations</strong>Add as many cities as you want</div></div>
+      <div class="left-feat"><span class="left-feat-icon">🌤️</span><div class="left-feat-text"><strong>Live Weather Data</strong>Real-time updates, always accurate</div></div>
+      <div class="left-feat"><span class="left-feat-icon">💾</span><div class="left-feat-text"><strong>Saved to Your Profile</strong>Your locations sync across devices</div></div>
+      <div class="left-feat"><span class="left-feat-icon">🔔</span><div class="left-feat-text"><strong>Weather Alerts</strong>Get notified before storms hit</div></div>
+    </div>
+  </div>
+ 
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="auth-box">
+ 
+      <a href="index.html" class="back-link">← Back to Home</a>
+ 
+      <!-- TABS -->
+      <div class="tabs" id="tabsRow">
+        <button class="tab-btn active" id="tabLogin"  onclick="switchTab('login')">🔐 Login</button>
+        <button class="tab-btn"        id="tabSignup" onclick="switchTab('signup')">✨ Sign Up</button>
+      </div>
+ 
+      <!-- ══ LOGIN ══ -->
+      <div id="loginForm">
+        <div class="form-card">
+          <div class="form-title">Welcome Back!</div>
+          <p class="form-sub">Sign in to access your personal weather dashboard.</p>
+          <div class="toast" id="loginToast"></div>
+          <div class="field">
+            <label class="field-label">Email Address</label>
+            <input class="field-input" type="email" id="loginEmail" placeholder="you@example.com"/>
+          </div>
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="loginPassword" placeholder="Your password"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('loginPassword',this)">👁️</button>
+            </div>
+          </div>
+          <div class="forgot-link">
+            <a onclick="switchTab('forgot')">Forgot password?</a>
+          </div>
+          <button class="submit-btn" id="loginBtn" onclick="doLogin()">🔐 Sign In</button>
+          <div class="switch-link">Don't have an account? <a onclick="switchTab('signup')">Sign up free →</a></div>
+        </div>
+      </div>
+ 
+      <!-- ══ SIGNUP ══ -->
+      <div id="signupForm" class="hidden">
+        <div class="form-card">
+          <div class="form-title">Create Account</div>
+          <p class="form-sub">Join SkyCast for free and start tracking your sky today.</p>
+          <div class="toast" id="signupToast"></div>
+          <div class="field">
+            <label class="field-label">Email Address</label>
+            <input class="field-input" type="email" id="signupEmail" placeholder="you@example.com"/>
+          </div>
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="signupPassword" placeholder="Create a strong password" oninput="checkStrength('signupPassword','pwdBar','pwdHint')"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('signupPassword',this)">👁️</button>
+            </div>
+            <div class="pwd-strength">
+              <div class="pwd-bar-wrap"><div class="pwd-bar" id="pwdBar"></div></div>
+              <div class="pwd-hint" id="pwdHint">Use at least 8 characters</div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Confirm Password</label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="signupConfirm" placeholder="Repeat your password"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('signupConfirm',this)">👁️</button>
+            </div>
+          </div>
+          <button class="submit-btn" id="signupBtn" onclick="doSignup()">✨ Create My Account</button>
+          <p class="terms-note">By signing up you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
+          <div class="switch-link">Already have an account? <a onclick="switchTab('login')">Sign in →</a></div>
+        </div>
+      </div>
+ 
+      <!-- ══ FORGOT PASSWORD ══ -->
+      <div id="forgotForm" class="hidden">
+        <div class="form-card">
+          <button class="back-to-login" onclick="switchTab('login')">← Back to Login</button>
+          <div class="form-title">Reset Password</div>
+          <p class="form-sub">Enter your registered email and a new password — it will be updated instantly in the database.</p>
+          <div class="toast" id="forgotToast"></div>
+          <div class="field">
+            <label class="field-label">Email Address</label>
+            <input class="field-input" type="email" id="forgotEmail" placeholder="you@example.com"/>
+          </div>
+          <div class="field">
+            <label class="field-label">New Password</label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="forgotNewPwd" placeholder="Enter new password" oninput="checkStrength('forgotNewPwd','forgotBar','forgotHint')"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('forgotNewPwd',this)">👁️</button>
+            </div>
+            <div class="pwd-strength">
+              <div class="pwd-bar-wrap"><div class="pwd-bar" id="forgotBar"></div></div>
+              <div class="pwd-hint" id="forgotHint">Use at least 8 characters</div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Confirm New Password</label>
+            <div class="field-wrap">
+              <input class="field-input" type="password" id="forgotConfirm" placeholder="Repeat new password"/>
+              <button class="pwd-toggle" type="button" onclick="togglePwd('forgotConfirm',this)">👁️</button>
+            </div>
+          </div>
+          <button class="submit-btn" id="forgotBtn" onclick="doForgot()">🔒 Update My Password</button>
+          <div class="switch-link" style="margin-top:1.2rem;">Remember your password? <a onclick="switchTab('login')">Sign in →</a></div>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+ 
+<script>
+ 
+  // ── SWITCH TAB
+  function switchTab(tab) {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('forgotForm').classList.add('hidden');
+    document.getElementById('tabsRow').style.display = (tab === 'forgot') ? 'none' : 'flex';
+    document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
+    document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+    if (tab === 'login')  document.getElementById('loginForm').classList.remove('hidden');
+    if (tab === 'signup') document.getElementById('signupForm').classList.remove('hidden');
+    if (tab === 'forgot') document.getElementById('forgotForm').classList.remove('hidden');
+    clearToasts();
+  }
+ 
+  // ── TOGGLE PASSWORD
+  function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text';     btn.textContent = '🙈'; }
+    else                         { inp.type = 'password'; btn.textContent = '👁️'; }
+  }
+ 
+  // ── PASSWORD STRENGTH
+  function checkStrength(inputId, barId, hintId) {
+    const val  = document.getElementById(inputId).value;
+    const bar  = document.getElementById(barId);
+    const hint = document.getElementById(hintId);
+    let score  = 0;
+    if (val.length >= 8)           score++;
+    if (/[A-Z]/.test(val))         score++;
+    if (/[0-9]/.test(val))         score++;
+    if (/[^A-Za-z0-9]/.test(val))  score++;
+    const levels = [
+      {w:'0%',   bg:'transparent', txt:'Use at least 8 characters'},
+      {w:'25%',  bg:'#f87171',     txt:'⚠️ Weak password'},
+      {w:'50%',  bg:'#fcd34d',     txt:'🟡 Fair — add numbers or symbols'},
+      {w:'75%',  bg:'#60a5fa',     txt:'🔵 Good password'},
+      {w:'100%', bg:'#34d399',     txt:'✅ Strong password!'},
+    ];
+    bar.style.width      = levels[score].w;
+    bar.style.background = levels[score].bg;
+    hint.textContent     = levels[score].txt;
+  }
+ 
+  // ── TOAST
+  function showToast(id, type, msg) {
+    const t = document.getElementById(id);
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    t.style.display = 'flex';
+    t.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  function clearToasts() {
+    document.querySelectorAll('.toast').forEach(t => t.style.display = 'none');
+  }
+ 
+  // ── LOGIN
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pwd   = document.getElementById('loginPassword').value;
+    const btn   = document.getElementById('loginBtn');
+    clearToasts();
+    if (!email || !pwd) { showToast('loginToast','error','❌ Please enter your email and password.'); return; }
+    btn.disabled = true; btn.innerHTML = '⏳ Signing in…';
+    try {
+      const res  = await fetch('/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pwd})});
+      const data = await res.json();
+      if (res.ok) {
+        showToast('loginToast','success','✅ Login successful! Redirecting…');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      } else {
+        showToast('loginToast','error', `❌ ${data.error || 'Login failed.'}`);
+        btn.disabled = false; btn.innerHTML = '🔐 Sign In';
+      }
+    } catch {
+      showToast('loginToast','error','❌ Server error. Make sure Flask is running.');
+      btn.disabled = false; btn.innerHTML = '🔐 Sign In';
+    }
+  }
+ 
+  // ── SIGNUP
+  async function doSignup() {
+    const email   = document.getElementById('signupEmail').value.trim();
+    const pwd     = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const btn     = document.getElementById('signupBtn');
+    clearToasts();
+    if (!email || !pwd || !confirm) { showToast('signupToast','error','❌ Please fill in all fields.'); return; }
+    if (!/\S+@\S+\.\S+/.test(email)) { showToast('signupToast','error','❌ Please enter a valid email.'); return; }
+    if (pwd.length < 8) { showToast('signupToast','error','❌ Password must be at least 8 characters.'); return; }
+    if (pwd !== confirm) { showToast('signupToast','error','❌ Passwords do not match.'); return; }
+    btn.disabled = true; btn.innerHTML = '⏳ Creating account…';
+    try {
+      const res  = await fetch('/auth/signup', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:pwd})});
+      const data = await res.json();
+      if (res.ok) {
+        showToast('signupToast','success','✅ Account created! Redirecting…');
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+      } else {
+        showToast('signupToast','error', `❌ ${data.error || 'Signup failed.'}`);
+        btn.disabled = false; btn.innerHTML = '✨ Create My Account';
+      }
+    } catch {
+      showToast('signupToast','error','❌ Server error. Make sure Flask is running.');
+      btn.disabled = false; btn.innerHTML = '✨ Create My Account';
+    }
+  }
+ 
+  // ── FORGOT PASSWORD — direct reset, no email needed
+  async function doForgot() {
+    const email   = document.getElementById('forgotEmail').value.trim();
+    const newPwd  = document.getElementById('forgotNewPwd').value;
+    const confirm = document.getElementById('forgotConfirm').value;
+    const btn     = document.getElementById('forgotBtn');
+    clearToasts();
+    if (!email || !newPwd || !confirm) { showToast('forgotToast','error','❌ Please fill in all fields.'); return; }
+    if (!/\S+@\S+\.\S+/.test(email))   { showToast('forgotToast','error','❌ Please enter a valid email.'); return; }
+    if (newPwd.length < 8)              { showToast('forgotToast','error','❌ Password must be at least 8 characters.'); return; }
+    if (newPwd !== confirm)             { showToast('forgotToast','error','❌ Passwords do not match.'); return; }
+    btn.disabled = true; btn.innerHTML = '⏳ Updating…';
+    try {
+      const res  = await fetch('/auth/direct-reset', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email, password:newPwd})});
+      const data = await res.json();
+      if (res.ok) {
+        showToast('forgotToast','success','✅ Password updated! You can now login with your new password.');
+        document.getElementById('forgotEmail').value   = '';
+        document.getElementById('forgotNewPwd').value  = '';
+        document.getElementById('forgotConfirm').value = '';
+        setTimeout(() => switchTab('login'), 2500);
+      } else {
+        showToast('forgotToast','error', `❌ ${data.error || 'Something went wrong.'}`);
+        btn.disabled = false; btn.innerHTML = '🔒 Update My Password';
+      }
+    } catch {
+      showToast('forgotToast','error','❌ Server error. Make sure Flask is running.');
+      btn.disabled = false; btn.innerHTML = '🔒 Update My Password';
+    }
+  }
+ 
+  // ── ENTER KEY
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (!document.getElementById('loginForm').classList.contains('hidden'))  doLogin();
+    else if (!document.getElementById('signupForm').classList.contains('hidden')) doSignup();
+    else if (!document.getElementById('forgotForm').classList.contains('hidden')) doForgot();
+  });
+ 
+</script>
+</body>
+</html>

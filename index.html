@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Randhawa SkyCast – Your Personal Sky</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:   #2a0050;
+      --purple-mid:    #6a00b8;
+      --purple-light:  #a855f7;
+      --purple-pale:   #d8b4fe;
+      --gold:          #f59e0b;
+      --gold-light:    #fcd34d;
+      --gold-pale:     #fef3c7;
+      --text-white:    #ffffff;
+      --text-soft:     #e9d5ff;
+    }
+ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    html { scroll-behavior: smooth; }
+ 
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--purple-deep);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+ 
+    /* ── SKY CANVAS ── */
+    #sky-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(
+        170deg,
+        #0d001a 0%,
+        #2a0050 25%,
+        #6a00b8 55%,
+        #b45309 80%,
+        #f59e0b 100%
+      );
+    }
+ 
+    /* Stars */
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      animation: twinkle var(--dur, 3s) ease-in-out infinite alternate;
+      opacity: 0;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.1; transform: scale(0.8); }
+      to   { opacity: 0.9; transform: scale(1.2); }
+    }
+ 
+    /* Floating clouds */
+    .clouds-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .cloud {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.18;
+      animation: drift var(--sp, 60s) linear infinite;
+    }
+    .cloud-1 { width: 600px; height: 220px; background: var(--purple-light); top: 10%; left: -20%; --sp: 70s; }
+    .cloud-2 { width: 400px; height: 160px; background: var(--gold);         top: 60%; left: -10%; --sp: 90s; }
+    .cloud-3 { width: 500px; height: 200px; background: var(--purple-mid);   top: 30%; left: 60%;  --sp: 80s; animation-delay:-30s; }
+    .cloud-4 { width: 300px; height: 120px; background: var(--gold-light);   top: 80%; left: 40%;  --sp: 100s; animation-delay:-50s; }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to   { transform: translateX(110vw); }
+    }
+ 
+    /* ── LAYOUT ── */
+    .page-wrap { position: relative; z-index: 10; }
+ 
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem 4rem;
+      backdrop-filter: blur(12px);
+      background: rgba(42, 0, 80, 0.45);
+      border-bottom: 1px solid rgba(168,85,247,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      height: 48px;
+      filter: drop-shadow(0 0 10px rgba(168,85,247,0.8));
+    }
+    .nav-logo-text {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #d8b4fe, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-soft);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      transition: color 0.25s;
+    }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--purple-mid), var(--gold));
+      color: #fff !important;
+      padding: 0.5rem 1.4rem;
+      border-radius: 30px;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(245,158,11,0.5) !important; color: #fff !important; }
+ 
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(168,85,247,0.2);
+      border: 1px solid rgba(168,85,247,0.5);
+      border-radius: 30px;
+      padding: 0.35rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--purple-pale);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-logo-img {
+      width: 240px;
+      filter: drop-shadow(0 0 50px rgba(168,85,247,1)) drop-shadow(0 0 20px rgba(245,158,11,0.6));
+      animation: float 4s ease-in-out infinite, fadeUp 1s ease both 0.2s;
+      margin-bottom: 2.5rem;
+      margin-top: 1rem;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0);    }
+      50%      { transform: translateY(-14px); }
+    }
+    .hero h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      background: linear-gradient(135deg, #e9d5ff 0%, #f59e0b 60%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.4rem;
+      animation: fadeUp 1s ease both 0.4s;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--text-soft);
+      max-width: 600px;
+      line-height: 1.75;
+      font-weight: 400;
+      animation: fadeUp 1s ease both 0.6s;
+      margin-bottom: 3rem;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 1s ease both 0.8s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #9333ea, #f59e0b);
+      color: #fff;
+      padding: 0.9rem 2.4rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      box-shadow: 0 8px 30px rgba(147,51,234,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(245,158,11,0.45); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--purple-pale);
+      padding: 0.9rem 2.4rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1.5px solid rgba(168,85,247,0.6);
+      transition: background 0.25s, color 0.25s;
+    }
+    .btn-secondary:hover { background: rgba(168,85,247,0.15); color: #fff; }
+ 
+    /* Scroll arrow */
+    .scroll-hint {
+      margin-top: 4rem;
+      animation: bounce 2s ease-in-out infinite, fadeUp 1s ease both 1.2s;
+      color: rgba(216,180,254,0.5);
+      font-size: 1.6rem;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(8px); }
+    }
+ 
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      background: rgba(106,0,184,0.25);
+      border-top: 1px solid rgba(168,85,247,0.2);
+      border-bottom: 1px solid rgba(168,85,247,0.2);
+      backdrop-filter: blur(8px);
+    }
+    .stat-item {
+      padding: 2rem 4rem;
+      text-align: center;
+      border-right: 1px solid rgba(168,85,247,0.2);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-number {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #c084fc, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+ 
+    /* ── FEATURES ── */
+    .section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 700;
+      background: linear-gradient(90deg, #e9d5ff, #fcd34d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .section-desc {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 1.05rem;
+      max-width: 560px;
+      margin: 0 auto 4rem;
+      line-height: 1.8;
+    }
+ 
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+    }
+    .feature-card {
+      background: rgba(42,0,80,0.6);
+      border: 1px solid rgba(168,85,247,0.25);
+      border-radius: 20px;
+      padding: 2.2rem 2rem;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(245,158,11,0.05));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(168,85,247,0.6);
+      box-shadow: 0 20px 50px rgba(147,51,234,0.25);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      font-size: 2.6rem;
+      margin-bottom: 1.2rem;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(245,158,11,0.4));
+    }
+    .feature-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.7rem;
+      letter-spacing: 0.01em;
+    }
+    .feature-text {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      line-height: 1.75;
+    }
+ 
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 6rem 2rem;
+      background: rgba(10,0,30,0.5);
+      border-top: 1px solid rgba(168,85,247,0.15);
+      border-bottom: 1px solid rgba(168,85,247,0.15);
+    }
+    .steps-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .step {
+      flex: 1;
+      min-width: 200px;
+      max-width: 240px;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      position: relative;
+    }
+    .step::after {
+      content: '→';
+      position: absolute;
+      right: -10px;
+      top: 40px;
+      font-size: 1.8rem;
+      color: rgba(168,85,247,0.4);
+    }
+    .step:last-child::after { display: none; }
+    .step-num {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 auto 1.2rem;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.5);
+    }
+    .step-title {
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #e9d5ff;
+    }
+    .step-text {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      line-height: 1.65;
+    }
+ 
+    /* ── WEATHER PREVIEW CARD ── */
+    .preview-section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    /* Two-column layout */
+    .preview-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-top: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .preview-two-col { grid-template-columns: 1fr; }
+    }
+ 
+    /* LEFT col — example cards */
+    .col-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .col-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(245,158,11,0.4), transparent);
+    }
+    .cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .weather-card-demo {
+      background: linear-gradient(145deg, rgba(106,0,184,0.5), rgba(42,0,80,0.8));
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 20px;
+      padding: 1.2rem 1.6rem;
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 6px 24px rgba(42,0,80,0.4);
+    }
+    .weather-card-demo:hover { transform: translateX(6px); box-shadow: 0 10px 36px rgba(147,51,234,0.3); }
+    .wc-icon { font-size: 2.8rem; filter: drop-shadow(0 4px 12px rgba(245,158,11,0.6)); flex-shrink: 0; }
+    .wc-info { flex: 1; }
+    .wc-city { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 0.2rem; }
+    .wc-desc { font-size: 0.85rem; color: var(--text-soft); font-weight: 600; margin-top: 0.15rem; }
+    .wc-meta { display: flex; gap: 0.8rem; font-size: 0.75rem; color: rgba(216,180,254,0.65); margin-top: 0.4rem; }
+    .wc-temp { font-family: 'Cinzel Decorative', serif; font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg,#e9d5ff,#fcd34d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; flex-shrink: 0; }
+ 
+    /* RIGHT col — Add location panel */
+    .add-location-panel {
+      background: rgba(42,0,80,0.55);
+      border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 24px;
+      padding: 2.4rem 2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 40px rgba(42,0,80,0.5);
+    }
+    .add-panel-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.3rem;
+      background: linear-gradient(90deg, #d8b4fe, #fcd34d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    .add-panel-sub {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .add-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .add-field-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--purple-pale);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .add-field-input {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(168,85,247,0.35);
+      border-radius: 12px;
+      padding: 0.85rem 1.2rem;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .add-field-input::placeholder { color: rgba(216,180,254,0.4); }
+    .add-field-input:focus {
+      border-color: var(--purple-light);
+      background: rgba(168,85,247,0.12);
+    }
+    .add-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .add-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #f59e0b);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 1rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      box-shadow: 0 6px 24px rgba(124,58,237,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .add-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(245,158,11,0.4); }
+    .add-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.2rem 0;
+      color: rgba(216,180,254,0.35);
+      font-size: 0.8rem;
+    }
+    .add-divider::before, .add-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(168,85,247,0.2);
+    }
+    .saved-locations-hint {
+      background: rgba(168,85,247,0.1);
+      border: 1px dashed rgba(168,85,247,0.3);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .saved-locations-hint span { font-size: 1.4rem; }
+ 
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 7rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    .cta-glow {
+      position: absolute;
+      width: 600px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(147,51,234,0.35), transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      background: linear-gradient(90deg, #e9d5ff, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.2rem;
+    }
+    .cta-section p {
+      color: var(--text-soft);
+      font-size: 1.05rem;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.75;
+    }
+ 
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(168,85,247,0.2);
+      background: rgba(10,0,25,0.8);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-brand {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem;
+      background: linear-gradient(90deg, #c084fc, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .footer-copy { font-size: 0.82rem; color: rgba(216,180,254,0.5); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: rgba(216,180,254,0.6); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold-light); }
+ 
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .stat-item { padding: 1.5rem 2rem; }
+      footer { flex-direction: column; text-align: center; padding: 2rem; }
+      .step::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+ 
+<!-- Background -->
+<div id="sky-canvas"></div>
+<div class="stars" id="stars"></div>
+<div class="clouds-layer">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+</div>
+ 
+<div class="page-wrap">
+ 
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Randhawa SkyCast Logo" onerror="this.style.display='none'"/>
+      <div class="nav-logo-text">Randhawa<br>SkyCast</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#preview">Preview</a></li>
+      <li><a href="auth.html" class="nav-cta">Get Started →</a></li>
+    </ul>
+  </nav>
+ 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">☁️ &nbsp; Live Weather · Anywhere You Are</div>
+    <img src="logo.png" alt="SkyCast Logo" class="hero-logo-img" onerror="this.style.display='none'"/>
+    <h1>Randhawa<br>SkyCast</h1>
+    <p class="hero-sub">
+      Your personal sky companion. Track real-time weather for all your favourite locations — all in one beautifully crafted dashboard.
+    </p>
+    <div class="hero-buttons">
+      <a href="auth.html" class="btn-primary">🌤 Check My Weather</a>
+      <a href="learn.html" class="btn-secondary">Learn More</a>
+    </div>
+    <div class="scroll-hint">↓</div>
+  </section>
+ 
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-number">200+</div>
+      <div class="stat-label">Countries Covered</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">Live</div>
+      <div class="stat-label">Real-Time Updates</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">∞</div>
+      <div class="stat-label">Saved Locations</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label">Always Available</div>
+    </div>
+  </div>
+ 
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="section-label">✦ What We Offer</div>
+    <h2 class="section-title">Everything the Sky Tells You</h2>
+    <p class="section-desc">From your hometown to your next holiday — SkyCast keeps you ahead of every cloud.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">📍</span>
+        <div class="feature-title">Location-Based Weather</div>
+        <p class="feature-text">Enter any city, town, or region and get an instant, accurate weather snapshot. Temperature, humidity, wind — all in one glance.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🗂️</span>
+        <div class="feature-title">Multi-Location Dashboard</div>
+        <p class="feature-text">Add as many locations as you need. Monitor your home, office, family's city, and travel destinations all at once.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💾</span>
+        <div class="feature-title">Saved to Your Profile</div>
+        <p class="feature-text">Your locations and preferences are securely saved to your personal profile. Pick up where you left off — every time.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌅</span>
+        <div class="feature-title">Daily Forecast View</div>
+        <p class="feature-text">See hourly and 7-day extended forecasts so you're always dressed right and ready for the day ahead.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔔</span>
+        <div class="feature-title">Weather Alerts</div>
+        <p class="feature-text">Get notified of extreme weather events — storms, heavy rain, or heat waves — before they arrive at your location.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🌙</span>
+        <div class="feature-title">Beautiful Night Mode</div>
+        <p class="feature-text">SkyCast looks stunning any time of day. The interface adapts to match the mood of the current sky and time of day.</p>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- HOW IT WORKS -->
+  <div class="how-section" id="how">
+    <div style="max-width:1000px;margin:0 auto;">
+      <div class="section-label">✦ Simple as Sky</div>
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-desc">Get your weather in three easy steps.</p>
+      <div class="steps-row">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-title">Create Your Profile</div>
+          <p class="step-text">Sign up and set up your personal SkyCast profile in seconds.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-title">Add Your Locations</div>
+          <p class="step-text">Enter the cities and places you care about. Add as many as you like.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-title">Watch the Sky</div>
+          <p class="step-text">Enjoy live, accurate weather data for all your saved locations instantly.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-title">Stay Informed</div>
+          <p class="step-text">Receive alerts and forecasts so you're always one step ahead of the weather.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- PREVIEW CARDS — TWO COLUMN -->
+  <section class="preview-section" id="preview">
+    <div class="section-label">✦ Live Preview</div>
+    <h2 class="section-title">Weather Cards at a Glance</h2>
+    <p class="section-desc">See your saved locations on the left — add new ones on the right. Simple as sky.</p>
+ 
+    
+ 
+      <!-- LEFT: Example Cards -->
+      <div>
+        <div class="col-label">☁️ View of Saved Locations</div>
+        <div class="cards-stack">
+ 
+          <div class="weather-card-demo">
+            <div class="wc-icon">☀️</div>
+            <div class="wc-info">
+              <div class="wc-city">📍 Ludhiana, Punjab</div>
+              <div class="wc-desc">Sunny &amp; Clear</div>
+              <div class="wc-meta"><span>💧 28%</span><span>💨 14 km/h</span><span>🌡️ Feels 34°</span></div>
+            </div>
+            <div class="wc-temp">32°</div>
+          </div>
+ 
+          <div class="weather-card-demo">
+            <div class="wc-icon">⛅</div>
+            <div class="wc-info">
+              <div class="wc-city">📍 Amritsar, Punjab</div>
+              <div class="wc-desc">Partly Cloudy</div>
+              <div class="wc-meta"><span>💧 40%</span><span>💨 10 km/h</span><span>🌡️ Feels 30°</span></div>
+            </div>
+            <div class="wc-temp">29°</div>
+          </div>
+ 
+          <div class="weather-card-demo">
+            <div class="wc-icon">🌧️</div>
+            <div class="wc-info">
+              <div class="wc-city">📍 New Delhi</div>
+              <div class="wc-desc">Light Rain</div>
+              <div class="wc-meta"><span>💧 72%</span><span>💨 22 km/h</span><span>🌡️ Feels 24°</span></div>
+            </div>
+            <div class="wc-temp">26°</div>
+          </div>
+ 
+          <div class="weather-card-demo">
+            <div class="wc-icon">🌤️</div>
+            <div class="wc-info">
+              <div class="wc-city">📍 Chandigarh</div>
+              <div class="wc-desc">Mostly Clear</div>
+              <div class="wc-meta"><span>💧 35%</span><span>💨 8 km/h</span><span>🌡️ Feels 31°</span></div>
+            </div>
+            <div class="wc-temp">30°</div>
+          </div>
+ 
+        </div>
+    
+ 
+ 
+    </div>
+  </section>
+ 
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-glow"></div>
+    <h2>Ready to Own Your Sky?</h2>
+    <p>Join Randhawa SkyCast today and never be caught off-guard by the weather again.</p>
+    <a href="auth.html" class="btn-primary" style="font-size:1.1rem;padding:1rem 3rem;">
+      🌤 Start for Free
+    </a>
+  </section>
+ 
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">Randhawa SkyCast</div>
+    <div class="footer-copy">© 2025 Randhawa SkyCast · All rights reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy & Terms</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </footer>
+ 
+</div><!-- end page-wrap -->
+ 
+<script>
+  // Generate stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      top:${Math.random()*60}%;
+      left:${Math.random()*100}%;
+      --dur:${2+Math.random()*4}s;
+      animation-delay:${Math.random()*5}s;
+    `;
+    starsEl.appendChild(s);
+  }
+</script>
+</body>
+</html>

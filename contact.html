@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact – Randhawa SkyCast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:  #0d0020;
+      --purple-mid:   #6a00b8;
+      --purple-light: #a855f7;
+      --purple-pale:  #d8b4fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --text-white:   #ffffff;
+      --text-soft:    #e9d5ff;
+      --card-bg:      rgba(42,0,80,0.55);
+      --border:       rgba(168,85,247,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--purple-deep);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+ 
+    /* ── BG ── */
+    .bg-fixed {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(160deg, #08000f 0%, #1e0040 35%, #4a0090 65%, #6b2f00 88%, #a05000 100%);
+    }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 1; }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(#7c3aed44, transparent 70%); top: -150px; left: -150px; }
+    .orb-2 { width: 450px; height: 450px; background: radial-gradient(#f59e0b2a, transparent 70%); bottom: -100px; right: -100px; }
+    .orb-3 { width: 350px; height: 350px; background: radial-gradient(#a855f720, transparent 70%); top: 40%; left: 50%; transform: translateX(-50%); }
+ 
+    .page-wrap { position: relative; z-index: 10; }
+ 
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      backdrop-filter: blur(14px);
+      background: rgba(8,0,20,0.65);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
+    .nav-logo img { height: 44px; filter: drop-shadow(0 0 10px rgba(168,85,247,0.8)); }
+    .nav-logo-text {
+      font-family: 'Cinzel Decorative', serif; font-size: 1.05rem; font-weight: 700;
+      background: linear-gradient(90deg, #d8b4fe, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--text-soft); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--purple-mid), var(--gold));
+      color: #fff !important; padding: 0.5rem 1.4rem; border-radius: 30px;
+      font-weight: 700 !important; box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+      transition: transform 0.2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px) !important; }
+    @media(max-width:768px){ nav{padding:1rem 1.5rem;} .nav-links{display:none;} }
+ 
+    /* ── PAGE HERO ── */
+    .page-hero {
+      text-align: center; padding: 5rem 2rem 3.5rem;
+    }
+    .breadcrumb {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; color: rgba(216,180,254,0.45); margin-bottom: 1.5rem;
+    }
+    .breadcrumb a { color: var(--gold); text-decoration: none; }
+    .hero-icon {
+      font-size: 3.8rem; display: block; margin-bottom: 1.2rem;
+      filter: drop-shadow(0 4px 18px rgba(168,85,247,0.8));
+      animation: floatIcon 4s ease-in-out infinite;
+    }
+    @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .page-hero h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 900;
+      background: linear-gradient(135deg, #e9d5ff 0%, #c084fc 45%, #f59e0b 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem; animation: fadeUp 0.8s ease both;
+    }
+    .page-hero p {
+      color: var(--text-soft); font-size: 1.05rem; max-width: 550px;
+      margin: 0 auto; line-height: 1.8; animation: fadeUp 0.8s ease both 0.2s;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+ 
+    /* ── MAIN LAYOUT ── */
+    .contact-wrap {
+      max-width: 1100px; margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 3rem; align-items: start;
+    }
+    @media(max-width:860px){ .contact-wrap{grid-template-columns:1fr;} }
+ 
+    /* ── LEFT INFO PANEL ── */
+    .info-panel { display: flex; flex-direction: column; gap: 1.2rem; }
+ 
+    .info-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.5rem 1.6rem;
+      backdrop-filter: blur(12px);
+      display: flex; gap: 1.1rem; align-items: flex-start;
+      transition: transform 0.3s, border-color 0.3s;
+      animation: fadeUp 0.7s ease both;
+    }
+    .info-card:nth-child(1){animation-delay:0.1s}
+    .info-card:nth-child(2){animation-delay:0.2s}
+    .info-card:nth-child(3){animation-delay:0.3s}
+    .info-card:nth-child(4){animation-delay:0.4s}
+    .info-card:hover { transform: translateX(5px); border-color: rgba(168,85,247,0.5); }
+    .ic-icon {
+      font-size: 1.8rem; flex-shrink: 0;
+      filter: drop-shadow(0 3px 8px rgba(245,158,11,0.4));
+    }
+    .ic-body h4 { font-size: 0.92rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem; }
+    .ic-body p { font-size: 0.85rem; color: var(--text-soft); line-height: 1.65; }
+    .ic-body a { color: var(--gold-light); text-decoration: none; font-weight: 700; }
+    .ic-body a:hover { text-decoration: underline; }
+ 
+    .response-badge {
+      background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3);
+      border-radius: 12px; padding: 1rem 1.3rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      font-size: 0.85rem; color: var(--text-soft);
+      animation: fadeUp 0.7s ease both 0.5s;
+    }
+    .response-badge span { font-size: 1.4rem; }
+ 
+    /* ── RIGHT FORM PANEL ── */
+    .form-panel {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 24px; padding: 2.5rem 2.2rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 50px rgba(42,0,80,0.5);
+      animation: fadeUp 0.7s ease both 0.15s;
+    }
+    .form-panel-title {
+      font-family: 'Cinzel Decorative', serif; font-size: 1.35rem;
+      background: linear-gradient(90deg, #e9d5ff, #fcd34d);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    .form-panel-sub { font-size: 0.9rem; color: var(--text-soft); margin-bottom: 2rem; line-height: 1.6; }
+ 
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:560px){ .form-row{grid-template-columns:1fr;} }
+ 
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+    .form-label {
+      font-size: 0.78rem; font-weight: 800; color: var(--purple-pale);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(168,85,247,0.3);
+      border-radius: 12px; padding: 0.85rem 1.1rem;
+      color: #fff; font-family: 'Nunito', sans-serif; font-size: 0.95rem;
+      outline: none; transition: border-color 0.25s, background 0.25s;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: rgba(216,180,254,0.35); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--purple-light); background: rgba(168,85,247,0.1);
+    }
+    .form-select { cursor: pointer; }
+    .form-select option { background: #1e0040; color: #fff; }
+    .form-textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
+ 
+    /* Character counter */
+    .char-counter {
+      text-align: right; font-size: 0.75rem;
+      color: rgba(216,180,254,0.4); margin-top: 0.2rem;
+    }
+    .char-counter.warn { color: var(--gold); }
+    .char-counter.over { color: #f87171; }
+ 
+    /* Subject tags */
+    .subject-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.1rem; }
+    .subject-tag {
+      background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3);
+      color: var(--purple-pale); padding: 0.35rem 0.9rem; border-radius: 20px;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    .subject-tag:hover, .subject-tag.active {
+      background: rgba(168,85,247,0.25); color: #fff;
+      border-color: rgba(168,85,247,0.7);
+    }
+    .subject-tag.active { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.5); color: var(--gold-light); }
+ 
+    /* Submit button */
+    .submit-btn {
+      width: 100%; background: linear-gradient(135deg, #7c3aed, #f59e0b);
+      color: #fff; border: none; border-radius: 14px;
+      padding: 1rem; font-family: 'Nunito', sans-serif;
+      font-size: 1rem; font-weight: 900; cursor: pointer;
+      letter-spacing: 0.04em;
+      box-shadow: 0 8px 28px rgba(124,58,237,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(245,158,11,0.4); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+ 
+    /* ── SUCCESS / ERROR STATE ── */
+    .form-toast {
+      display: none; border-radius: 12px; padding: 1rem 1.3rem;
+      font-size: 0.9rem; font-weight: 700; margin-bottom: 1.2rem;
+      align-items: center; gap: 0.7rem;
+    }
+    .form-toast.success {
+      display: flex;
+      background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #86efac;
+    }
+    .form-toast.error {
+      display: flex;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5;
+    }
+ 
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); background: rgba(5,0,15,0.9);
+      backdrop-filter: blur(10px); padding: 2rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-brand {
+      font-family: 'Cinzel Decorative', serif; font-size: 0.95rem;
+      background: linear-gradient(90deg, #c084fc, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-copy { font-size: 0.8rem; color: rgba(216,180,254,0.38); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: rgba(216,180,254,0.5); font-size: 0.82rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold-light); }
+    @media(max-width:600px){ footer{flex-direction:column;text-align:center;padding:1.5rem;} }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-fixed"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+ 
+<div class="page-wrap">
+ 
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
+      <div class="nav-logo-text">Randhawa<br>SkyCast</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="learn.html">Learn More</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="auth.html" class="nav-cta">Get Started →</a></li>
+    </ul>
+  </nav>
+ 
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> › Contact Us
+    </div>
+    <span class="hero-icon">📬</span>
+    <h1>Get In Touch</h1>
+    <p>Got a question, complaint, feedback, or idea? Send us a message — it goes straight to our team and we'll get back to you fast.</p>
+  </div>
+ 
+  <!-- CONTACT LAYOUT -->
+  <div class="contact-wrap">
+ 
+    <!-- LEFT: Info cards -->
+    <div class="info-panel">
+          <div class="info-card">
+        <div class="ic-icon">🐛</div>
+        <div class="ic-body">
+          <h4>Reporting a Bug?</h4>
+          <p>Describe what happened, what page you were on, and your browser. The more detail, the faster we fix it.</p>
+        </div>
+      </div>
+ 
+      <div class="info-card">
+        <div class="ic-icon">💡</div>
+        <div class="ic-body">
+          <h4>Feature Suggestions</h4>
+          <p>We love hearing ideas from users. Every suggestion is reviewed by our team and may shape the next SkyCast update.</p>
+        </div>
+      </div>
+ 
+      <div class="info-card">
+        <div class="ic-icon">🔒</div>
+        <div class="ic-body">
+          <h4>Privacy Concerns</h4>
+          <p>For data access, deletion requests, or privacy queries — see our <a href="privacy.html">Privacy Policy</a> or contact us here.</p>
+        </div>
+      </div>
+ 
+      <div class="response-badge">
+        <span>⏱️</span>
+        <div>We typically respond within <strong style="color:#fcd34d;">24 hours</strong> on weekdays. Messages sent over the weekend are answered on Monday.</div>
+      </div>
+ 
+    </div>
+ 
+    <!-- RIGHT: Contact Form -->
+    <div class="form-panel">
+      <div class="form-panel-title">Send Us a Message</div>
+      <p class="form-panel-sub">Fill in the form below and your message will be saved and sent directly to our inbox.</p>
+ 
+      <!-- Toast notifications -->
+      <div class="form-toast success" id="toast-success">
+        ✅ &nbsp; Message sent successfully! We'll get back to you within 24 hours.
+      </div>
+      <div class="form-toast error" id="toast-error">
+        ❌ &nbsp; Something went wrong. Please try again or email us directly.
+      </div>
+ 
+      <form id="contactForm" novalidate>
+ 
+        <!-- Name + Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name *</label>
+            <input class="form-input" type="text" id="name" name="name" placeholder="Your name" required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address *</label>
+            <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" required/>
+          </div>
+        </div>
+ 
+        <!-- Subject quick-pick -->
+        <div class="form-group">
+          <label class="form-label">Subject — Quick Pick</label>
+          <div class="subject-tags">
+            <span class="subject-tag" data-val="General Question">❓ General Question</span>
+            <span class="subject-tag" data-val="Bug Report">🐛 Bug Report</span>
+            <span class="subject-tag" data-val="Feature Request">💡 Feature Request</span>
+            <span class="subject-tag" data-val="Complaint">📢 Complaint</span>
+            <span class="subject-tag" data-val="Privacy Query">🔒 Privacy</span>
+            <span class="subject-tag" data-val="Other">📌 Other</span>
+          </div>
+          <input class="form-input" type="text" id="subject" name="subject" placeholder="Or type your own subject…" required/>
+        </div>
+ 
+        <!-- Priority -->
+        <div class="form-group">
+          <label class="form-label" for="priority">Priority</label>
+          <select class="form-select form-input" id="priority" name="priority">
+            <option value="low">🟢 Low — General question or feedback</option>
+            <option value="medium" selected>🟡 Medium — Something isn't working right</option>
+            <option value="high">🔴 High — Urgent issue or data concern</option>
+          </select>
+        </div>
+ 
+        <!-- Message -->
+        <div class="form-group">
+          <label class="form-label" for="message">Your Message *</label>
+          <textarea class="form-textarea" id="message" name="message"
+            placeholder="Describe your question, issue, or idea in detail…" maxlength="2000" required></textarea>
+          <div class="char-counter" id="charCount">0 / 2000 characters</div>
+        </div>
+ 
+        <!-- Submit -->
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="btnText">📨 Send Message</span>
+        </button>
+ 
+      </form>
+    </div>
+ 
+  </div>
+ 
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">Randhawa SkyCast</div>
+    <div class="footer-copy">© 2025 Randhawa SkyCast · All rights reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy & Terms</a>
+      <a href="contact.html" style="color:var(--gold-light);">Contact</a>
+    </div>
+  </footer>
+ 
+</div>
+ 
+<script>
+  // Subject quick-pick tags
+  const tags = document.querySelectorAll('.subject-tag');
+  const subjectInput = document.getElementById('subject');
+  tags.forEach(tag => {
+    tag.addEventListener('click', () => {
+      tags.forEach(t => t.classList.remove('active'));
+      tag.classList.add('active');
+      subjectInput.value = tag.dataset.val;
+    });
+  });
+ 
+  // Character counter
+  const msgArea = document.getElementById('message');
+  const counter = document.getElementById('charCount');
+  msgArea.addEventListener('input', () => {
+    const len = msgArea.value.length;
+    counter.textContent = `${len} / 2000 characters`;
+    counter.className = 'char-counter' + (len > 1800 ? ' over' : len > 1500 ? ' warn' : '');
+  });
+ 
+  // Form submit → POST to Flask
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const successToast = document.getElementById('toast-success');
+    const errorToast = document.getElementById('toast-error');
+ 
+    // Reset toasts
+    successToast.style.display = 'none';
+    errorToast.style.display = 'none';
+ 
+    // Loading state
+    btn.disabled = true;
+    btnText.textContent = '⏳ Sending…';
+ 
+    const payload = {
+      name:     document.getElementById('name').value.trim(),
+      email:    document.getElementById('email').value.trim(),
+      subject:  document.getElementById('subject').value.trim(),
+      priority: document.getElementById('priority').value,
+      message:  msgArea.value.trim()
+    };
+ 
+    try {
+      const res = await fetch('/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+ 
+      if (res.ok) {
+        successToast.style.display = 'flex';
+        document.getElementById('contactForm').reset();
+        tags.forEach(t => t.classList.remove('active'));
+        counter.textContent = '0 / 2000 characters';
+        counter.className = 'char-counter';
+        window.scrollTo({ top: document.querySelector('.form-panel').offsetTop - 100, behavior: 'smooth' });
+      } else {
+        errorToast.style.display = 'flex';
+      }
+    } catch {
+      errorToast.style.display = 'flex';
+    }
+ 
+    btn.disabled = false;
+    btnText.textContent = '📨 Send Message';
+  });
+</script>
+</body>
+</html>

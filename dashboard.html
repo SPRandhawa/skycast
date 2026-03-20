@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – Randhawa SkyCast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:  #0d0020;
+      --purple-mid:   #6a00b8;
+      --purple-light: #a855f7;
+      --purple-pale:  #d8b4fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --text-soft:    #e9d5ff;
+      --card-bg:      rgba(42,0,80,0.55);
+      --border:       rgba(168,85,247,0.25);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Nunito',sans-serif; background:var(--purple-deep); color:#fff; overflow-x:hidden; min-height:100vh; }
+ 
+    /* BG */
+    .bg-fixed { position:fixed; inset:0; z-index:0; background:linear-gradient(160deg,#08000f 0%,#1e0040 35%,#4a0090 65%,#7a3500 88%,#b05000 100%); }
+    .bg-orb   { position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:1; }
+    .orb-1    { width:600px; height:600px; background:radial-gradient(#7c3aed40,transparent 70%); top:-150px; left:-150px; }
+    .orb-2    { width:500px; height:500px; background:radial-gradient(#f59e0b28,transparent 70%); bottom:-100px; right:-100px; }
+ 
+    .page-wrap { position:relative; z-index:10; display:flex; flex-direction:column; min-height:100vh; }
+ 
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin   { to{transform:rotate(360deg)} }
+    @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.5} }
+ 
+    /* ── TOPBAR ── */
+    .topbar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0.9rem 2rem; background:rgba(8,0,20,0.8);
+      border-bottom:1px solid var(--border); backdrop-filter:blur(14px);
+      position:sticky; top:0; z-index:100;
+    }
+    .topbar-logo { display:flex; align-items:center; gap:0.8rem; text-decoration:none; }
+    .topbar-logo img { height:38px; filter:drop-shadow(0 0 8px rgba(168,85,247,0.7)); }
+    .topbar-logo-text { font-family:'Cinzel Decorative',serif; font-size:0.95rem; background:linear-gradient(90deg,#d8b4fe,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1.2; }
+    .user-pill   { background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.25); color:var(--text-soft); border-radius:20px; padding:0.3rem 1rem; font-size:0.82rem; font-weight:700; }
+    .logout-btn  { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; border-radius:20px; padding:0.3rem 1rem; font-size:0.82rem; font-weight:700; cursor:pointer; }
+    .logout-btn:hover { background:rgba(239,68,68,0.25); }
+ 
+    /* ── MAIN LAYOUT ── */
+    .main { display:grid; grid-template-columns:310px 1fr; flex:1; }
+    @media(max-width:900px){ .main{grid-template-columns:1fr;} }
+ 
+    /* ── SIDEBAR ── */
+    .sidebar {
+      border-right:1px solid var(--border);
+      padding:1.8rem 1.4rem;
+      background:rgba(8,0,20,0.4);
+      backdrop-filter:blur(10px);
+      display:flex; flex-direction:column; gap:1.6rem;
+      overflow-y:auto;
+    }
+    .sidebar-title { font-size:0.7rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); font-weight:800; margin-bottom:0.8rem; }
+    .add-form { display:flex; flex-direction:column; gap:0.75rem; }
+    .add-label { font-size:0.7rem; font-weight:800; color:var(--purple-pale); letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:0.3rem; }
+    .add-input { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid rgba(168,85,247,0.28); border-radius:10px; padding:0.7rem 1rem; color:#fff; font-family:'Nunito',sans-serif; font-size:0.88rem; outline:none; transition:border-color 0.2s; }
+    .add-input::placeholder { color:rgba(216,180,254,0.35); }
+    .add-input:focus { border-color:var(--purple-light); background:rgba(168,85,247,0.08); }
+    select.add-input { cursor:pointer; }
+    select.add-input option { background:#1e0040; color:#fff; }
+    .add-btn { width:100%; background:linear-gradient(135deg,#7c3aed,#f59e0b); color:#fff; border:none; border-radius:10px; padding:0.8rem; font-family:'Nunito',sans-serif; font-size:0.9rem; font-weight:800; cursor:pointer; transition:transform 0.2s; box-shadow:0 4px 18px rgba(124,58,237,0.35); }
+    .add-btn:hover { transform:translateY(-2px); }
+    .add-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+    .add-feedback { font-size:0.82rem; padding:0.6rem 0.9rem; border-radius:8px; display:none; }
+    .add-feedback.error   { display:block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; }
+    .add-feedback.success { display:block; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); color:#6ee7b7; }
+ 
+    /* Saved locations */
+    .saved-list { display:flex; flex-direction:column; gap:0.5rem; }
+    .saved-item { display:flex; align-items:center; justify-content:space-between; background:rgba(42,0,80,0.4); border:1px solid var(--border); border-radius:10px; padding:0.7rem 1rem; cursor:pointer; transition:all 0.2s; gap:0.5rem; }
+    .saved-item:hover  { border-color:rgba(168,85,247,0.5); background:rgba(42,0,80,0.7); }
+    .saved-item.active { border-color:var(--gold); background:rgba(245,158,11,0.08); }
+    .saved-item-name   { font-size:0.88rem; font-weight:700; }
+    .saved-item-sub    { font-size:0.72rem; color:rgba(216,180,254,0.5); margin-top:1px; }
+    .saved-del { background:none; border:none; color:rgba(239,68,68,0.5); cursor:pointer; font-size:0.9rem; padding:2px 5px; border-radius:4px; }
+    .saved-del:hover { color:#f87171; }
+    .no-locs { text-align:center; color:rgba(216,180,254,0.4); font-size:0.85rem; line-height:1.7; padding:1rem 0; }
+ 
+    /* ── CONTENT ── */
+    .content { padding:2rem; overflow-y:auto; }
+    .state-box { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; gap:1rem; }
+    .state-icon  { font-size:4rem; opacity:0.5; }
+    .state-title { font-family:'Cinzel Decorative',serif; font-size:1.3rem; background:linear-gradient(90deg,#e9d5ff,#fcd34d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .state-sub   { font-size:0.9rem; color:rgba(216,180,254,0.5); max-width:320px; line-height:1.7; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(168,85,247,0.2); border-top-color:var(--purple-light); border-radius:50%; animation:spin 0.8s linear infinite; }
+ 
+    /* ── WEATHER CARD ── */
+    .w-card { background:var(--card-bg); border:1px solid var(--border); border-radius:24px; overflow:hidden; backdrop-filter:blur(14px); animation:fadeUp 0.5s ease both; box-shadow:0 12px 40px rgba(42,0,80,0.4); }
+ 
+    /* Section label */
+    .sec-lbl { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.14em; color:var(--gold); padding:0 1.8rem; margin-bottom:0.8rem; display:block; }
+ 
+    /* 1. CURRENT WEATHER */
+    .curr-top { padding:2rem 1.8rem 1.5rem; background:linear-gradient(135deg,rgba(106,0,184,0.3),rgba(245,158,11,0.08)); position:relative; }
+    .curr-loc-row { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.4rem; }
+    .curr-city    { font-family:'Cinzel Decorative',serif; font-size:1.6rem; background:linear-gradient(90deg,#fff,#d8b4fe); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .curr-country { font-size:0.82rem; color:rgba(216,180,254,0.5); margin-top:0.2rem; }
+    .curr-nick    { background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:var(--gold-light); border-radius:20px; padding:0.25rem 0.9rem; font-size:0.75rem; font-weight:800; }
+    .curr-main    { display:flex; align-items:center; gap:1.5rem; }
+    .curr-temp    { font-family:'Cinzel Decorative',serif; font-size:5.5rem; font-weight:700; background:linear-gradient(135deg,#fff,#fcd34d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+    .curr-emoji   { font-size:4.5rem; filter:drop-shadow(0 4px 16px rgba(245,158,11,0.5)); }
+    .curr-desc    { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:0.3rem; }
+    .curr-feels   { font-size:0.85rem; color:rgba(216,180,254,0.6); }
+    .curr-minmax  { font-size:0.85rem; color:rgba(216,180,254,0.6); margin-top:0.2rem; }
+ 
+    /* 2. STATS */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; padding:1.4rem 1.8rem; border-top:1px solid var(--border); }
+    @media(max-width:650px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
+    .stat-box   { text-align:center; }
+    .stat-emoji { font-size:1.5rem; display:block; margin-bottom:0.3rem; }
+    .stat-val   { font-size:1rem; font-weight:800; color:#fff; }
+    .stat-lbl   { font-size:0.68rem; color:rgba(216,180,254,0.5); text-transform:uppercase; letter-spacing:0.08em; margin-top:0.15rem; }
+ 
+    /* AQI */
+    .aqi-wrap     { padding:0 1.8rem 1.4rem; }
+    .aqi-row      { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
+    .aqi-title    { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); }
+    .aqi-val      { font-size:0.88rem; font-weight:800; }
+    .aqi-track    { height:8px; background:rgba(168,85,247,0.15); border-radius:8px; overflow:hidden; }
+    .aqi-fill     { height:100%; border-radius:8px; transition:width 0.8s ease; }
+ 
+    /* 3. ALERT */
+    .alert-wrap  { margin:0 1.8rem 1.4rem; border-radius:14px; padding:1rem 1.2rem; display:flex; align-items:flex-start; gap:0.8rem; }
+    .alert-wrap.red    { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.45); animation:pulse 2s ease-in-out infinite; }
+    .alert-wrap.orange { background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.45); animation:pulse 2.5s ease-in-out infinite; }
+    .alert-wrap.yellow { background:rgba(234,179,8,0.12);  border:1px solid rgba(234,179,8,0.45);  }
+    .alert-wrap.green  { background:rgba(34,197,94,0.1);   border:1px solid rgba(34,197,94,0.3);   }
+    .alert-icon  { font-size:1.5rem; flex-shrink:0; margin-top:1px; }
+    .alert-title { font-size:0.85rem; font-weight:900; margin-bottom:0.2rem; }
+    .alert-msg   { font-size:0.82rem; opacity:0.8; line-height:1.5; }
+ 
+    /* 4. SUNRISE SUNSET */
+    .sun-row { display:flex; gap:1rem; padding:0 1.8rem 1.4rem; }
+    .sun-box { flex:1; background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:14px; padding:1rem; text-align:center; }
+    .sun-emo  { font-size:1.8rem; display:block; margin-bottom:0.4rem; }
+    .sun-time { font-size:1.1rem; font-weight:800; color:var(--gold-light); }
+    .sun-lbl  { font-size:0.68rem; color:rgba(216,180,254,0.5); text-transform:uppercase; letter-spacing:0.08em; margin-top:0.2rem; }
+ 
+    /* 5. HOURLY GRAPH */
+    .graph-section { padding:0 1.8rem 1.4rem; }
+    .graph-box     { background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:16px; padding:1rem 0.5rem 0.5rem; overflow-x:auto; }
+ 
+    /* 6. HOURLY PILLS */
+    .hourly-row { display:flex; gap:0.7rem; overflow-x:auto; padding:0 1.8rem 1.4rem; scrollbar-width:none; }
+    .hourly-row::-webkit-scrollbar { display:none; }
+    .h-pill { background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:14px; padding:0.75rem 0.85rem; text-align:center; flex-shrink:0; min-width:68px; }
+    .h-pill:hover { border-color:rgba(168,85,247,0.5); }
+    .h-time  { font-size:0.7rem; color:rgba(216,180,254,0.6); font-weight:700; margin-bottom:0.3rem; }
+    .h-emoji { font-size:1.4rem; display:block; margin:0.2rem 0; }
+    .h-temp  { font-size:0.9rem; font-weight:800; }
+    .h-pop   { font-size:0.65rem; color:#60a5fa; font-weight:700; margin-top:2px; }
+ 
+    /* 7. 7-DAY */
+    .seven-list { display:flex; flex-direction:column; gap:0.5rem; padding:0 1.8rem 1.4rem; }
+    .day-row    { display:flex; align-items:center; gap:0.8rem; background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:12px; padding:0.85rem 1.1rem; }
+    .day-row:hover { border-color:rgba(168,85,247,0.4); }
+    .day-name   { font-size:0.88rem; font-weight:700; width:80px; flex-shrink:0; }
+    .day-date   { font-size:0.7rem; color:rgba(216,180,254,0.4); font-weight:400; }
+    .day-emoji  { font-size:1.6rem; flex-shrink:0; }
+    .day-desc   { font-size:0.8rem; color:rgba(216,180,254,0.6); flex:1; }
+    .day-pop    { font-size:0.75rem; color:#60a5fa; font-weight:700; flex-shrink:0; }
+    .day-temps  { font-size:0.88rem; font-weight:700; flex-shrink:0; }
+    .day-hi     { color:#fcd34d; }
+    .day-lo     { color:rgba(216,180,254,0.5); margin-left:0.4rem; }
+ 
+    /* 8. MONTHLY */
+    .month-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(95px,1fr)); gap:0.6rem; padding:0 1.8rem 1.4rem; }
+    .month-card { background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:12px; padding:0.7rem 0.5rem; text-align:center; cursor:pointer; transition:all 0.2s; }
+    .month-card:hover { border-color:rgba(168,85,247,0.6); background:rgba(42,0,80,0.7); transform:translateY(-2px); }
+    .month-card.today { border-color:var(--gold); background:rgba(245,158,11,0.1); }
+    .mc-day   { font-size:0.68rem; color:rgba(216,180,254,0.5); text-transform:uppercase; font-weight:700; }
+    .mc-date  { font-size:0.72rem; color:rgba(216,180,254,0.35); margin-bottom:0.3rem; }
+    .mc-emoji { font-size:1.5rem; display:block; margin:0.2rem 0; }
+    .mc-hi    { font-size:0.82rem; font-weight:800; color:#fcd34d; }
+    .mc-lo    { font-size:0.72rem; color:rgba(216,180,254,0.5); }
+    .mc-pop   { font-size:0.65rem; color:#60a5fa; font-weight:700; margin-top:2px; }
+ 
+    /* Month detail modal */
+    .modal-overlay { position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:1rem; animation:fadeUp 0.2s ease both; }
+    .modal-box { background:linear-gradient(135deg,rgba(42,0,80,0.95),rgba(20,0,40,0.98)); border:1px solid rgba(168,85,247,0.4); border-radius:24px; padding:2rem; max-width:400px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.6); position:relative; }
+    .modal-close { position:absolute; top:1rem; right:1rem; background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:var(--purple-pale); border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .modal-close:hover { background:rgba(168,85,247,0.3); }
+    .modal-date   { font-size:0.75rem; color:var(--gold); font-weight:800; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; }
+    .modal-emoji  { font-size:4rem; display:block; margin:0.5rem 0; filter:drop-shadow(0 4px 12px rgba(245,158,11,0.4)); }
+    .modal-title  { font-family:'Cinzel Decorative',serif; font-size:1.2rem; background:linear-gradient(90deg,#e9d5ff,#fcd34d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:0.3rem; }
+    .modal-temps  { font-size:1rem; color:rgba(216,180,254,0.8); margin-bottom:1.2rem; }
+    .modal-stats  { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+    .modal-stat   { background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.2); border-radius:10px; padding:0.7rem; text-align:center; }
+    .modal-stat-v { font-size:0.95rem; font-weight:800; color:#fff; }
+    .modal-stat-l { font-size:0.68rem; color:rgba(216,180,254,0.5); text-transform:uppercase; letter-spacing:0.07em; margin-top:0.2rem; }
+ 
+    /* 9. SUGGESTIONS */
+    .suggest-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:0.8rem; padding:0 1.8rem 2rem; }
+    .suggest-card { background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:14px; padding:1rem; display:flex; align-items:flex-start; gap:0.8rem; }
+    .suggest-card:hover { border-color:rgba(168,85,247,0.4); }
+    .sug-icon  { font-size:1.8rem; flex-shrink:0; }
+    .sug-title { font-size:0.75rem; font-weight:800; color:var(--purple-pale); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.3rem; }
+    .sug-text  { font-size:0.82rem; color:var(--text-soft); line-height:1.55; }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-fixed"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+ 
+<div class="page-wrap">
+ 
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <a href="index.html" class="topbar-logo">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
+      <div class="topbar-logo-text">Randhawa<br>SkyCast</div>
+    </a>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="user-pill" id="userPill">👤 Loading…</span>
+      <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+ 
+  <!-- MAIN -->
+  <div class="main">
+ 
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+ 
+      <!-- ADD LOCATION FORM -->
+      <div>
+        <div class="sidebar-title">➕ Add Location</div>
+        <div class="add-form">
+ 
+          <div>
+            <label class="add-label">1. Select Country *</label>
+            <select class="add-input" id="countrySelect" onchange="onCountryChange()">
+              <option value="">— Choose a country —</option>
+              <option value="IN">🇮🇳 India</option>
+              <option value="US">🇺🇸 United States</option>
+              <option value="GB">🇬🇧 United Kingdom</option>
+              <option value="CA">🇨🇦 Canada</option>
+              <option value="AU">🇦🇺 Australia</option>
+              <option value="PK">🇵🇰 Pakistan</option>
+              <option value="BD">🇧🇩 Bangladesh</option>
+              <option value="NP">🇳🇵 Nepal</option>
+              <option value="LK">🇱🇰 Sri Lanka</option>
+              <option value="AE">🇦🇪 UAE</option>
+              <option value="SA">🇸🇦 Saudi Arabia</option>
+              <option value="QA">🇶🇦 Qatar</option>
+              <option value="KW">🇰🇼 Kuwait</option>
+              <option value="OM">🇴🇲 Oman</option>
+              <option value="SG">🇸🇬 Singapore</option>
+              <option value="MY">🇲🇾 Malaysia</option>
+              <option value="DE">🇩🇪 Germany</option>
+              <option value="FR">🇫🇷 France</option>
+              <option value="IT">🇮🇹 Italy</option>
+              <option value="ES">🇪🇸 Spain</option>
+              <option value="NL">🇳🇱 Netherlands</option>
+              <option value="JP">🇯🇵 Japan</option>
+              <option value="CN">🇨🇳 China</option>
+              <option value="KR">🇰🇷 South Korea</option>
+              <option value="BR">🇧🇷 Brazil</option>
+              <option value="MX">🇲🇽 Mexico</option>
+              <option value="ZA">🇿🇦 South Africa</option>
+              <option value="NG">🇳🇬 Nigeria</option>
+              <option value="EG">🇪🇬 Egypt</option>
+              <option value="RU">🇷🇺 Russia</option>
+              <option value="TR">🇹🇷 Turkey</option>
+              <option value="ID">🇮🇩 Indonesia</option>
+              <option value="PH">🇵🇭 Philippines</option>
+              <option value="TH">🇹🇭 Thailand</option>
+              <option value="NZ">🇳🇿 New Zealand</option>
+              <option value="AR">🇦🇷 Argentina</option>
+              <option value="Other">🌍 Other</option>
+            </select>
+          </div>
+ 
+          <div id="stateWrap" style="display:none;">
+            <label class="add-label">2. State / Region</label>
+            <input class="add-input" type="text" id="stateInput" placeholder="e.g. Punjab, California…"/>
+          </div>
+ 
+          <div id="cityWrap" style="display:none;">
+            <label class="add-label">3. City / Town *</label>
+            <input class="add-input" type="text" id="cityInput" placeholder="e.g. Ludhiana, London…"/>
+          </div>
+ 
+          <div id="nickWrap" style="display:none;">
+            <label class="add-label">Nickname (optional)</label>
+            <input class="add-input" type="text" id="nickInput" placeholder="e.g. Home, Office…"/>
+          </div>
+ 
+          <div class="add-feedback" id="addFeedback"></div>
+          <button class="add-btn" id="addBtn" onclick="addLocation()" style="display:none;">🌍 Add Location</button>
+        </div>
+      </div>
+ 
+      <!-- SAVED LOCATIONS -->
+      <div>
+        <div class="sidebar-title">📍 Your Locations</div>
+        <div class="saved-list" id="savedList">
+          <div class="no-locs">No locations yet.<br/>Add a city above!</div>
+        </div>
+      </div>
+ 
+    </div>
+ 
+    <!-- CONTENT -->
+    <div class="content" id="content">
+      <div class="state-box">
+        <span class="state-icon">🌤️</span>
+        <div class="state-title">Your Sky Awaits</div>
+        <p class="state-sub">Select a country and add a city from the sidebar to see live weather here.</p>
+      </div>
+    </div>
+ 
+  </div>
+</div>
+ 
+<!-- MONTHLY DETAIL MODAL -->
+<div class="modal-overlay" id="monthModal" style="display:none;" onclick="closeModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeMonthModal()">✕</button>
+    <div class="modal-date"  id="mDate"></div>
+    <span class="modal-emoji" id="mEmoji"></span>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-temps" id="mTemps"></div>
+    <div class="modal-stats" id="mStats"></div>
+  </div>
+</div>
+ 
+<script>
+  let locations = [];
+ 
+  // ── ICON CODE → EMOJI
+  const ICON_MAP = {
+    '01d':'☀️','01n':'🌙','02d':'🌤️','02n':'🌤️',
+    '03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️',
+    '09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌦️',
+    '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️',
+    '50d':'🌫️','50n':'🌫️'
+  };
+  function toEmoji(code) { return ICON_MAP[code] || '🌤️'; }
+ 
+  // ── CHECK LOGIN
+  window.addEventListener('DOMContentLoaded', async () => {
+    const res  = await fetch('/auth/me');
+    const data = await res.json();
+    if (!data.logged_in) { window.location.href = 'auth.html'; return; }
+    document.getElementById('userPill').textContent = '👤 ' + data.email;
+    loadLocations();
+    // Enter key on city input
+    setTimeout(() => {
+      const ci = document.getElementById('cityInput');
+      if (ci) ci.addEventListener('keydown', e => { if (e.key === 'Enter') addLocation(); });
+    }, 300);
+  });
+ 
+  // ── LOGOUT
+  async function doLogout() {
+    await fetch('/auth/logout', { method:'POST' });
+    window.location.href = 'auth.html';
+  }
+ 
+  // ── COUNTRY DROPDOWN
+  function onCountryChange() {
+    const val  = document.getElementById('countrySelect').value;
+    const show = val !== '';
+    ['stateWrap','cityWrap','nickWrap'].forEach(id => {
+      document.getElementById(id).style.display = show ? 'block' : 'none';
+    });
+    document.getElementById('addBtn').style.display = show ? 'block' : 'none';
+    document.getElementById('stateInput').value = '';
+    document.getElementById('cityInput').value  = '';
+    document.getElementById('nickInput').value  = '';
+    document.getElementById('addFeedback').className = 'add-feedback';
+  }
+ 
+  // ── LOAD LOCATIONS
+  async function loadLocations() {
+    const res = await fetch('/locations/get');
+    locations = await res.json();
+    renderSidebar();
+    if (locations.length > 0) showWeather(locations[0]);
+  }
+ 
+  // ── RENDER SIDEBAR
+  function renderSidebar() {
+    const list = document.getElementById('savedList');
+    if (!locations.length) {
+      list.innerHTML = '<div class="no-locs">No locations yet.<br/>Add a city above!</div>';
+      return;
+    }
+    list.innerHTML = '';
+    locations.forEach(loc => {
+      locations.forEach(l => { window['_loc_' + l.id] = l; });
+      const div = document.createElement('div');
+      div.className = 'saved-item';
+      div.id = 'item-' + loc.id;
+      div.innerHTML =
+        '<div>'
+        + '<div class="saved-item-name">📍 ' + (loc.nickname || loc.city) + '</div>'
+        + '<div class="saved-item-sub">' + loc.city + (loc.country ? ', ' + loc.country : '') + '</div>'
+        + '</div>'
+        + '<button class="saved-del" title="Remove">✕</button>';
+      div.querySelector('.saved-del').onclick = function(e) {
+        e.stopPropagation();
+        deleteLocation(loc.id);
+      };
+      div.onclick = function() { showWeather(window['_loc_' + loc.id]); };
+      list.appendChild(div);
+    });
+  }
+ 
+  // ── ADD LOCATION
+  async function addLocation() {
+    const countryCode = document.getElementById('countrySelect').value;
+    const state       = document.getElementById('stateInput').value.trim();
+    const city        = document.getElementById('cityInput').value.trim();
+    const nickname    = document.getElementById('nickInput').value.trim();
+    const btn         = document.getElementById('addBtn');
+    const fb          = document.getElementById('addFeedback');
+    fb.className = 'add-feedback';
+ 
+    if (!countryCode) { showFb('error','❌ Please select a country.'); return; }
+    if (!city)        { showFb('error','❌ Please enter a city name.'); return; }
+ 
+    const country = countryCode === 'Other' ? '' : countryCode;
+    btn.disabled = true; btn.textContent = '⏳ Adding…';
+ 
+    const res  = await fetch('/locations/add', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ city, country, nickname })
+    });
+    const data = await res.json();
+    btn.disabled = false; btn.textContent = '🌍 Add Location';
+ 
+    if (res.ok) {
+      showFb('success', '✅ ' + city + ' added!');
+      document.getElementById('countrySelect').value = '';
+      document.getElementById('stateInput').value    = '';
+      document.getElementById('cityInput').value     = '';
+      document.getElementById('nickInput').value     = '';
+      ['stateWrap','cityWrap','nickWrap'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      document.getElementById('addBtn').style.display = 'none';
+      locations.push(data);
+      window['_loc_' + data.id] = data;
+      renderSidebar();
+      showWeather(data);
+    } else {
+      showFb('error', '❌ ' + (data.error || 'Error adding location'));
+    }
+  }
+ 
+  function showFb(type, msg) {
+    const fb = document.getElementById('addFeedback');
+    fb.className = 'add-feedback ' + type;
+    fb.textContent = msg;
+  }
+ 
+  // ── DELETE LOCATION
+  async function deleteLocation(id) {
+    if (!confirm('Remove this location?')) return;
+    await fetch('/locations/delete/' + id, { method:'DELETE' });
+    locations = locations.filter(l => l.id !== id);
+    renderSidebar();
+    if (locations.length > 0) showWeather(locations[0]);
+    else document.getElementById('content').innerHTML =
+      '<div class="state-box"><span class="state-icon">🌤️</span>'
+      + '<div class="state-title">Your Sky Awaits</div>'
+      + '<p class="state-sub">Add a city from the sidebar to see live weather.</p></div>';
+  }
+ 
+  // ── SHOW WEATHER
+  async function showWeather(loc) {
+    document.querySelectorAll('.saved-item').forEach(el => el.classList.remove('active'));
+    const item = document.getElementById('item-' + loc.id);
+    if (item) item.classList.add('active');
+ 
+    document.getElementById('content').innerHTML =
+      '<div class="state-box"><div class="spinner"></div>'
+      + '<p style="color:rgba(216,180,254,0.5);margin-top:1rem;">Fetching weather for ' + loc.city + '…</p></div>';
+ 
+    const res  = await fetch('/weather/get?city=' + encodeURIComponent(loc.city) + '&country=' + encodeURIComponent(loc.country || ''));
+    const data = await res.json();
+ 
+    if (!res.ok) {
+      document.getElementById('content').innerHTML =
+        '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:16px;padding:2rem;text-align:center;color:#fca5a5;max-width:400px;margin:2rem auto;">'
+        + '<div style="font-size:2.5rem;margin-bottom:1rem;">⚠️</div>'
+        + '<div style="font-size:1rem;font-weight:800;margin-bottom:0.5rem;">' + (data.error || 'Could not fetch weather') + '</div>'
+        + '<div style="font-size:0.85rem;opacity:0.7;">Check the city name and try again.</div></div>';
+      return;
+    }
+ 
+    document.getElementById('content').innerHTML = buildCard(data, loc);
+  }
+ 
+  // ── BUILD FULL WEATHER CARD
+  function buildCard(w, loc) {
+    const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+ 
+    // Weather emoji (icon is already converted to emoji by backend)
+    const mainEmoji = w.icon || '🌤️';
+ 
+    // ── 1. ALERT
+    function getAlert() {
+      const t = w.temp, wind = w.wind_speed, vis = w.visibility;
+      const desc = (w.description || '').toLowerCase();
+      if (t >= 45 || t <= -10 || wind >= 60 || desc.indexOf('storm') !== -1)
+        return { cls:'red',    icon:'🔴', title:'RED ALERT',    msg:'Extreme conditions! Stay indoors. Do not go outside.' };
+      if (t >= 40 || t <= 0  || wind >= 40 || vis < 0.5)
+        return { cls:'orange', icon:'🟠', title:'ORANGE ALERT', msg:'Dangerous weather. Take precautions and limit outdoor activity.' };
+      if (t >= 35 || wind >= 25 || vis < 1  || w.humidity >= 90 || desc.indexOf('rain') !== -1)
+        return { cls:'yellow', icon:'🟡', title:'YELLOW ALERT', msg:'Moderate warning. Be cautious when going outside.' };
+      return { cls:'green', icon:'✅', title:'NO ALERT', msg:'All clear! Weather is safe and pleasant today.' };
+    }
+    const alert = getAlert();
+ 
+    // ── 2. SUGGESTIONS
+    function getSuggestions() {
+      const tips = [];
+      const t    = w.temp;
+      const desc = (w.description || '').toLowerCase();
+      const rain  = desc.indexOf('rain')    !== -1 || desc.indexOf('drizzle') !== -1 || desc.indexOf('shower') !== -1;
+      const snow  = desc.indexOf('snow')    !== -1;
+      const storm = desc.indexOf('storm')   !== -1 || desc.indexOf('thunder') !== -1;
+      const fog   = desc.indexOf('fog')     !== -1 || desc.indexOf('mist')    !== -1 || w.visibility < 1;
+ 
+      if      (t >= 38) tips.push({ icon:'👕', title:'Light Clothes',   text:'Very hot! Wear loose cotton. Avoid dark colours.' });
+      else if (t >= 30) tips.push({ icon:'👔', title:'Casual Wear',     text:'Warm day. Short sleeves and light fabric.' });
+      else if (t >= 22) tips.push({ icon:'🧥', title:'Light Jacket',    text:'Nice weather. Carry a light jacket for evenings.' });
+      else if (t >= 12) tips.push({ icon:'🧣', title:'Warm Clothes',    text:'Cool today. Jacket and scarf recommended.' });
+      else if (t >= 2)  tips.push({ icon:'🧤', title:'Heavy Clothing',  text:'Cold! Heavy coat, gloves and warm layers.' });
+      else              tips.push({ icon:'🥶', title:'Extreme Cold',    text:'Freezing! Stay inside. Wrap up fully if you go out.' });
+ 
+      if      (storm) tips.push({ icon:'⛈️', title:'Storm — Stay In',   text:'Do not go out in a storm. Stay indoors safely.' });
+      else if (rain)  tips.push({ icon:'☂️', title:'Take Umbrella',     text:'Rain today. Definitely carry an umbrella!' });
+      else if (w.humidity >= 80) tips.push({ icon:'🌂', title:'Maybe Umbrella', text:'High humidity. Light drizzle possible. Keep one handy.' });
+      else            tips.push({ icon:'🌞', title:'No Umbrella',       text:'Dry conditions. No rain expected today.' });
+ 
+      if (t >= 30)           tips.push({ icon:'🕶️', title:'Sun Protection',   text:'Apply sunscreen SPF 30+. Wear sunglasses.' });
+      if (t >= 35)           tips.push({ icon:'💧', title:'Stay Hydrated',    text:'Very hot! Drink at least 3 litres of water.' });
+      else if (t >= 28)      tips.push({ icon:'🥤', title:'Drink Water',      text:'Warm weather. Keep yourself hydrated.' });
+      if (w.wind_speed >= 40) tips.push({ icon:'🌪️', title:'High Winds',      text:'Avoid outdoors. Secure loose items around you.' });
+      else if (w.wind_speed >= 25) tips.push({ icon:'💨', title:'Windy',       text:'Windy today. Hold hats and umbrellas tight!' });
+      if (fog)               tips.push({ icon:'🚗', title:'Drive Carefully',  text:'Low visibility. Use fog lights and drive slowly.' });
+      if (snow)              tips.push({ icon:'⛄', title:'Snow Alert',       text:'Snowfall expected. Waterproof boots and warm layers.' });
+      if (t >= 18 && t <= 28 && !rain && !storm)
+                             tips.push({ icon:'🚶', title:'Great for Outdoors','text':'Lovely weather! Perfect for a walk or jog.' });
+      return tips.slice(0, 6);
+    }
+    const suggestions = getSuggestions();
+ 
+    // ── 3. HOURLY GRAPH SVG
+    function buildGraph(hourlyRaw) {
+      // Deduplicate hourly data
+      var seen = {}, hourly = [];
+      hourlyRaw.forEach(function(h) {
+        if (!seen[h.time]) { seen[h.time] = true; hourly.push(h); }
+      });
+      // Sort by hour
+      hourly.sort(function(a,b){ return parseInt(a.time)-parseInt(b.time); });
+ 
+      if (!hourly || hourly.length < 2) return '<p style="text-align:center;color:rgba(216,180,254,0.4);padding:1rem;">No hourly data</p>';
+      const nowH  = new Date().getHours();
+      const temps = hourly.map(h => h.temp);
+      const minT  = Math.min.apply(null, temps) - 3;
+      const maxT  = Math.max.apply(null, temps) + 3;
+      const W = 680, H = 120, PL = 34, PR = 10, PT = 22, PB = 46;
+      const iW = W - PL - PR, iH = H - PT - PB;
+      const xOf = function(i) { return PL + i * (iW / (hourly.length - 1)); };
+      const yOf = function(t) { return PT + iH - ((t - minT) / (maxT - minT)) * iH; };
+ 
+      var pts = hourly.map(function(h, i) { return { x: xOf(i), y: yOf(h.temp), h: h }; });
+ 
+      // Smooth bezier path
+      var path = 'M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1);
+      for (var i = 1; i < pts.length; i++) {
+        var cx = (pts[i-1].x + pts[i].x) / 2;
+        path += ' C ' + cx.toFixed(1) + ' ' + pts[i-1].y.toFixed(1) + ' ' + cx.toFixed(1) + ' ' + pts[i].y.toFixed(1) + ' ' + pts[i].x.toFixed(1) + ' ' + pts[i].y.toFixed(1);
+      }
+      var area = path + ' L ' + pts[pts.length-1].x.toFixed(1) + ' ' + (PT+iH) + ' L ' + pts[0].x.toFixed(1) + ' ' + (PT+iH) + ' Z';
+ 
+      // Grid
+      var grid = '';
+      [0, 33, 67, 100].forEach(function(pct) {
+        var y = PT + (pct / 100) * iH;
+        var t = Math.round(maxT - (pct/100) * (maxT - minT));
+        grid += '<line x1="' + PL + '" y1="' + y.toFixed(1) + '" x2="' + (W-PR) + '" y2="' + y.toFixed(1) + '" stroke="rgba(168,85,247,0.1)" stroke-dasharray="3 3"/>';
+        grid += '<text x="' + (PL-3) + '" y="' + (y+3).toFixed(1) + '" text-anchor="end" font-size="8" fill="rgba(216,180,254,0.4)" font-family="Nunito,sans-serif">' + t + '°</text>';
+      });
+ 
+      // Dots and labels
+      var dots = '';
+      pts.forEach(function(p, i) {
+        var hNum   = parseInt(p.h.time);
+        var isPast = hNum < nowH;
+        var dotC   = isPast ? 'rgba(168,85,247,0.2)' : '#c084fc';
+        var strokeC= isPast ? 'rgba(124,58,237,0.15)' : '#7c3aed';
+        var tempC  = isPast ? 'rgba(216,180,254,0.25)' : '#fcd34d';
+        var timeC  = isPast ? 'rgba(216,180,254,0.2)'  : 'rgba(216,180,254,0.75)';
+        dots += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="' + dotC + '" stroke="' + strokeC + '" stroke-width="1.5"/>';
+        dots += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y - 8).toFixed(1) + '" text-anchor="middle" font-size="9" font-weight="bold" fill="' + tempC + '" font-family="Nunito,sans-serif">' + p.h.temp + '°</text>';
+        dots += '<text x="' + p.x.toFixed(1) + '" y="' + (PT+iH+13).toFixed(1) + '" text-anchor="middle" font-size="8" fill="' + timeC + '" font-family="Nunito,sans-serif">' + p.h.time + ':00</text>';
+        dots += '<text x="' + p.x.toFixed(1) + '" y="' + (PT+iH+28).toFixed(1) + '" text-anchor="middle" font-size="12">' + (p.h.icon || '🌤️') + '</text>';
+      });
+ 
+      // NOW line
+      var nowMark = '';
+      for (var ni = 0; ni < pts.length; ni++) {
+        if (parseInt(pts[ni].h.time) >= nowH) {
+          nowMark = '<line x1="' + pts[ni].x.toFixed(1) + '" y1="' + PT + '" x2="' + pts[ni].x.toFixed(1) + '" y2="' + (PT+iH) + '" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 2"/>';
+          nowMark += '<text x="' + pts[ni].x.toFixed(1) + '" y="' + (PT-5) + '" text-anchor="middle" font-size="8" fill="#f59e0b" font-weight="bold" font-family="Nunito,sans-serif">NOW</text>';
+          break;
+        }
+      }
+ 
+      return '<svg viewBox="0 0 ' + W + ' ' + (H+5) + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:480px;height:' + (H+10) + 'px;display:block;">'
+        + '<defs><linearGradient id="tGrad" x1="0" y1="0" x2="0" y2="1">'
+        + '<stop offset="0%" stop-color="#a855f7" stop-opacity="0.35"/>'
+        + '<stop offset="100%" stop-color="#a855f7" stop-opacity="0.02"/>'
+        + '</linearGradient></defs>'
+        + grid
+        + '<path d="' + area + '" fill="url(#tGrad)"/>'
+        + '<path d="' + path + '" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+        + nowMark
+        + dots
+        + '</svg>';
+    }
+ 
+    // ── 4. HOURLY PILLS — only future slots, no duplicates
+    var hourlyHTML = '';
+    var nowH = new Date().getHours();
+    var seenTimes = {};
+    var futureHours = [];
+ 
+    // First pass: deduplicate and keep only future hours
+    w.hourly.forEach(function(h) {
+      var hH = parseInt(h.time);
+      if (seenTimes[h.time]) return; // skip duplicate
+      seenTimes[h.time] = true;
+      // Mark as current slot if it's the closest upcoming 3-hour slot
+      var isCurrent = (hH >= nowH && hH < nowH + 3);
+      futureHours.push({ h: h, hH: hH, isCurrent: isCurrent });
+    });
+ 
+    // Sort by hour ascending
+    futureHours.sort(function(a, b) { return a.hH - b.hH; });
+ 
+    // Show all slots — past ones hidden, current highlighted, future normal
+    futureHours.forEach(function(item) {
+      var h   = item.h;
+      var hH  = item.hH;
+      var pop = h.pop > 0 ? '<div class="h-pop">💧' + h.pop + '%</div>' : '';
+ 
+      var border  = '';
+      var opacity = '1';
+ 
+      if (hH < nowH) {
+        // Past — completely skip, don't show
+        return;
+      } else if (item.isCurrent) {
+        // Current time slot — highlight with gold border
+        border = 'border-color:var(--gold);background:rgba(245,158,11,0.1);';
+      }
+ 
+      hourlyHTML +=
+        '<div class="h-pill" style="' + border + 'opacity:' + opacity + '">'
+        + (item.isCurrent ? '<div style="font-size:0.6rem;color:var(--gold);font-weight:800;margin-bottom:2px;">NOW</div>' : '')
+        + '<div class="h-time">' + String(hH).padStart(2,'0') + ':00</div>'
+        + '<span class="h-emoji">' + (h.icon || '🌤️') + '</span>'
+        + '<div class="h-temp">' + h.temp + '°</div>'
+        + pop
+        + '</div>';
+    });
+ 
+    // If no future hours found (rare edge case), show all
+    if (!hourlyHTML) {
+      w.hourly.forEach(function(h) {
+        var hH = parseInt(h.time);
+        var pop = h.pop > 0 ? '<div class="h-pop">💧' + h.pop + '%</div>' : '';
+        hourlyHTML +=
+          '<div class="h-pill">'
+          + '<div class="h-time">' + String(hH).padStart(2,'0') + ':00</div>'
+          + '<span class="h-emoji">' + (h.icon || '🌤️') + '</span>'
+          + '<div class="h-temp">' + h.temp + '°</div>'
+          + pop
+          + '</div>';
+      });
+    }
+ 
+    // ── 5. 7-DAY
+    var sevenHTML = '';
+    w.seven_day.forEach(function(d) {
+      var date = new Date(d.date + 'T12:00:00');
+      var name = DAY_SHORT[date.getDay()];
+      sevenHTML +=
+        '<div class="day-row">'
+        + '<div class="day-name">' + name + '<br><span class="day-date">' + d.date.slice(5) + '</span></div>'
+        + '<span class="day-emoji">' + (d.icon || '🌤️') + '</span>'
+        + '<div class="day-desc">' + d.desc + '</div>'
+        + '<div class="day-pop">💧' + (d.pop || 0) + '%</div>'
+        + '<div class="day-temps"><span class="day-hi">↑' + d.high + '°</span><span class="day-lo">↓' + d.low + '°</span></div>'
+        + '</div>';
+    });
+ 
+    // ── 6. MONTHLY 28 days (clickable)
+    var monthHTML = '';
+    var today = new Date();
+    for (var mi = 0; mi < 28; mi++) {
+      var mDate = new Date(today);
+      mDate.setDate(today.getDate() + mi);
+      var src   = w.seven_day[mi % w.seven_day.length] || w.seven_day[0];
+      var v     = Math.round(Math.sin(mi * 0.8) * 2);
+      var mHi   = src.high + v;
+      var mLo   = src.low  + v;
+      var mEmoji= src.icon || '🌤️';
+      var mDesc = src.desc;
+      var mPop  = src.pop || 0;
+      var mDay  = DAY_SHORT[mDate.getDay()];
+      var mDt   = String(mDate.getDate()).padStart(2,'0') + '/' + String(mDate.getMonth()+1).padStart(2,'0');
+      var isTdy = (mi === 0) ? ' today' : '';
+      var dataStr= mDate.toDateString() + '||' + mEmoji + '||' + mDesc + '||' + mHi + '||' + mLo + '||' + mPop + '||' + (src.desc || '');
+      monthHTML +=
+        '<div class="month-card' + isTdy + '" onclick="openMonthModal(\'' + dataStr.replace(/'/g, '&apos;') + '\')">'
+        + '<div class="mc-day">' + mDay + '</div>'
+        + '<div class="mc-date">' + mDt + '</div>'
+        + '<span class="mc-emoji">' + mEmoji + '</span>'
+        + '<div class="mc-hi">↑' + mHi + '°</div>'
+        + '<div class="mc-lo">↓' + mLo + '°</div>'
+        + '<div class="mc-pop">💧' + mPop + '%</div>'
+        + '</div>';
+    }
+ 
+    // ── 7. AQI
+    var aqiColors = {1:'#34d399',2:'#86efac',3:'#fcd34d',4:'#f97316',5:'#f87171'};
+    var aqiWidths  = {1:'20%',2:'40%',3:'60%',4:'80%',5:'100%'};
+    var aqiHTML = '';
+    if (w.aqi) {
+      aqiHTML =
+        '<div class="aqi-wrap">'
+        + '<div class="aqi-row"><span class="aqi-title">🌬️ Air Quality Index</span>'
+        + '<span class="aqi-val" style="color:' + (aqiColors[w.aqi]||'#fff') + '">' + w.aqi_label + '</span></div>'
+        + '<div class="aqi-track"><div class="aqi-fill" style="width:' + (aqiWidths[w.aqi]||'50%') + ';background:' + (aqiColors[w.aqi]||'#a855f7') + '"></div></div>'
+        + '</div>';
+    }
+ 
+    // ── 8. SUGGESTIONS HTML
+    var sugHTML = '';
+    suggestions.forEach(function(s) {
+      sugHTML +=
+        '<div class="suggest-card">'
+        + '<span class="sug-icon">' + s.icon + '</span>'
+        + '<div><div class="sug-title">' + s.title + '</div>'
+        + '<div class="sug-text">' + s.text + '</div></div>'
+        + '</div>';
+    });
+ 
+    // ── ASSEMBLE CARD
+    return '<div class="w-card">'
+ 
+      // 1. Current weather header
+      + '<div class="curr-top">'
+      + '<div class="curr-loc-row">'
+      + '<div><div class="curr-city">' + w.city + '</div>'
+      + '<div class="curr-country">' + w.country + (loc.nickname ? ' &nbsp;·&nbsp; <span style="color:var(--gold-light)">' + loc.nickname + '</span>' : '') + '</div></div>'
+      + (loc.nickname ? '<div class="curr-nick">🏷️ ' + loc.nickname + '</div>' : '')
+      + '</div>'
+      + '<div class="curr-main">'
+      + '<div class="curr-temp">' + w.temp + '°</div>'
+      + '<div class="curr-emoji">' + mainEmoji + '</div>'
+      + '<div><div class="curr-desc">' + w.description + '</div>'
+      + '<div class="curr-feels">Feels like ' + w.feels_like + '°C</div>'
+      + '<div class="curr-minmax">↑ ' + w.temp_max + '°&nbsp;&nbsp; ↓ ' + w.temp_min + '°</div>'
+      + '</div></div></div>'
+ 
+      // 2. Stats
+      + '<div class="stats-grid">'
+      + '<div class="stat-box"><span class="stat-emoji">💧</span><div class="stat-val">' + w.humidity + '%</div><div class="stat-lbl">Humidity</div></div>'
+      + '<div class="stat-box"><span class="stat-emoji">💨</span><div class="stat-val">' + w.wind_speed + ' km/h</div><div class="stat-lbl">Wind ' + (w.wind_dir||'') + '</div></div>'
+      + '<div class="stat-box"><span class="stat-emoji">👁️</span><div class="stat-val">' + w.visibility + ' km</div><div class="stat-lbl">Visibility</div></div>'
+      + '<div class="stat-box"><span class="stat-emoji">📊</span><div class="stat-val">' + w.pressure + ' hPa</div><div class="stat-lbl">Pressure</div></div>'
+      + '</div>'
+ 
+      // AQI
+      + aqiHTML
+ 
+      // 3. Alert
+      + '<div class="alert-wrap ' + alert.cls + '">'
+      + '<span class="alert-icon">' + alert.icon + '</span>'
+      + '<div><div class="alert-title">' + alert.title + '</div>'
+      + '<div class="alert-msg">' + alert.msg + '</div></div>'
+      + '</div>'
+ 
+      // 4. Sunrise / Sunset
+      + '<div class="sun-row">'
+      + '<div class="sun-box"><span class="sun-emo">🌅</span><div class="sun-time">' + w.sunrise + '</div><div class="sun-lbl">Sunrise</div></div>'
+      + '<div class="sun-box"><span class="sun-emo">🌇</span><div class="sun-time">' + w.sunset  + '</div><div class="sun-lbl">Sunset</div></div>'
+      + '</div>'
+ 
+      // 5. Hourly temp graph
+      + '<span class="sec-lbl">📈 Hourly Temperature — Full Day (Past hours dimmed · NOW marker in gold)</span>'
+      + '<div class="graph-section"><div class="graph-box">' + buildGraph(w.hourly) + '</div></div>'
+ 
+      // 6. Hourly pills
+      + '<span class="sec-lbl">⏱️ Forecast Every 3 Hours</span>'
+      + '<div class="hourly-row">' + hourlyHTML + '</div>'
+ 
+      // 7. 7-day
+      + '<span class="sec-lbl">📅 7-Day Forecast</span>'
+      + '<div class="seven-list">' + sevenHTML + '</div>'
+ 
+      // 8. Monthly
+      + '<span class="sec-lbl">📆 Monthly Overview — Click Any Day for Details</span>'
+      + '<div class="month-grid">' + monthHTML + '</div>'
+ 
+      // 9. Suggestions
+      + '<span class="sec-lbl">💡 Today\'s Suggestions</span>'
+      + '<div class="suggest-grid">' + sugHTML + '</div>'
+ 
+      + '</div>';
+  }
+ 
+  // ── MONTHLY MODAL
+  function openMonthModal(dataStr) {
+    var parts  = dataStr.split('||');
+    var date   = parts[0];
+    var emoji  = parts[1];
+    var desc   = parts[2];
+    var hi     = parts[3];
+    var lo     = parts[4];
+    var pop    = parts[5];
+ 
+    document.getElementById('mDate').textContent  = date;
+    document.getElementById('mEmoji').textContent = emoji;
+    document.getElementById('mTitle').textContent = desc;
+    document.getElementById('mTemps').textContent = '↑ ' + hi + '°C  ·  ↓ ' + lo + '°C';
+    document.getElementById('mStats').innerHTML   =
+      '<div class="modal-stat"><div class="modal-stat-v">' + hi + '°</div><div class="modal-stat-l">High Temp</div></div>'
+      + '<div class="modal-stat"><div class="modal-stat-v">' + lo + '°</div><div class="modal-stat-l">Low Temp</div></div>'
+      + '<div class="modal-stat"><div class="modal-stat-v">💧 ' + pop + '%</div><div class="modal-stat-l">Rain Chance</div></div>'
+      + '<div class="modal-stat"><div class="modal-stat-v">' + emoji + '</div><div class="modal-stat-l">Condition</div></div>';
+ 
+    document.getElementById('monthModal').style.display = 'flex';
+  }
+ 
+  function closeMonthModal() {
+    document.getElementById('monthModal').style.display = 'none';
+  }
+ 
+  function closeModal(e) {
+    if (e.target === document.getElementById('monthModal')) closeMonthModal();
+  }
+ 
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMonthModal();
+  });
+ 
+</script>
+</body>
+</html>

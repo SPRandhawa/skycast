@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learn More – Randhawa SkyCast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:  #0d0020;
+      --purple-mid:   #6a00b8;
+      --purple-light: #a855f7;
+      --purple-pale:  #d8b4fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --text-white:   #ffffff;
+      --text-soft:    #e9d5ff;
+      --card-bg:      rgba(42,0,80,0.55);
+      --border:       rgba(168,85,247,0.25);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--purple-deep);
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+ 
+    /* ── BG ── */
+    .bg-fixed {
+      position: fixed; inset: 0; z-index: 0;
+      background: linear-gradient(160deg, #0a0018 0%, #1e0040 30%, #4a0090 60%, #7c3a00 85%, #b45309 100%);
+    }
+    .bg-orb {
+      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 1;
+    }
+    .orb-1 { width: 700px; height: 700px; background: radial-gradient(#7c3aed44, transparent 70%); top: -200px; left: -200px; }
+    .orb-2 { width: 500px; height: 500px; background: radial-gradient(#f59e0b33, transparent 70%); bottom: -100px; right: -100px; }
+    .orb-3 { width: 400px; height: 400px; background: radial-gradient(#a855f722, transparent 70%); top: 40%; left: 50%; transform: translateX(-50%); }
+ 
+    .page-wrap { position: relative; z-index: 10; }
+ 
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      backdrop-filter: blur(14px);
+      background: rgba(13,0,32,0.6);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.8rem; text-decoration: none; }
+    .nav-logo img { height: 44px; filter: drop-shadow(0 0 10px rgba(168,85,247,0.8)); }
+    .nav-logo-text {
+      font-family: 'Cinzel Decorative', serif; font-size: 1.05rem; font-weight: 700;
+      background: linear-gradient(90deg, #d8b4fe, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--text-soft); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--purple-mid), var(--gold));
+      color: #fff !important; padding: 0.5rem 1.4rem; border-radius: 30px;
+      font-weight: 700 !important; box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+      transition: transform 0.2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px) !important; }
+    @media(max-width:768px){ nav{padding:1rem 1.5rem;} .nav-links{display:none;} }
+ 
+    /* ── PAGE HERO ── */
+    .page-hero {
+      text-align: center;
+      padding: 5rem 2rem 4rem;
+      position: relative;
+    }
+    .breadcrumb {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; color: rgba(216,180,254,0.5);
+      margin-bottom: 1.5rem; letter-spacing: 0.06em;
+    }
+    .breadcrumb a { color: var(--gold); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .page-hero h1 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2rem, 5vw, 4rem); font-weight: 900;
+      background: linear-gradient(135deg, #e9d5ff 0%, #c084fc 40%, #f59e0b 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .page-hero p {
+      color: var(--text-soft); font-size: 1.1rem; max-width: 600px;
+      margin: 0 auto; line-height: 1.8;
+      animation: fadeUp 0.8s ease both 0.2s;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+ 
+    /* ── TABLE OF CONTENTS ── */
+    .toc-bar {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 0.6rem;
+      padding: 1.5rem 2rem 3rem;
+      animation: fadeUp 0.8s ease both 0.4s;
+    }
+    .toc-pill {
+      background: rgba(168,85,247,0.12);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: var(--purple-pale); padding: 0.4rem 1.1rem;
+      border-radius: 30px; font-size: 0.82rem; font-weight: 700;
+      text-decoration: none; letter-spacing: 0.04em;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .toc-pill:hover {
+      background: rgba(168,85,247,0.28); color: #fff;
+      border-color: rgba(168,85,247,0.6);
+    }
+ 
+    /* ── SECTION WRAPPER ── */
+    .content-wrap { max-width: 1100px; margin: 0 auto; padding: 0 2rem 6rem; }
+ 
+    /* ── SECTION TITLE ── */
+    .sec-tag {
+      display: inline-block; font-size: 0.72rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold); font-weight: 800;
+      margin-bottom: 0.7rem;
+    }
+    .sec-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 700;
+      background: linear-gradient(90deg, #e9d5ff, #fcd34d);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.8rem;
+    }
+    .sec-body {
+      color: var(--text-soft); font-size: 1rem; line-height: 1.85;
+      max-width: 700px; margin-bottom: 3rem;
+    }
+    .section-divider {
+      border: none; border-top: 1px solid rgba(168,85,247,0.15);
+      margin: 4rem 0;
+    }
+ 
+    /* ── ABOUT BLOCK ── */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;
+    }
+    @media(max-width:700px){ .about-grid{grid-template-columns:1fr;} }
+    .about-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem; backdrop-filter: blur(12px);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .about-card:hover { transform: translateY(-5px); border-color: rgba(168,85,247,0.5); }
+    .about-icon { font-size: 2.4rem; margin-bottom: 1rem; display: block; }
+    .about-card h3 { font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 0.6rem; }
+    .about-card p { font-size: 0.92rem; color: var(--text-soft); line-height: 1.75; }
+ 
+    /* ── STEP BY STEP ── */
+    .steps-list { display: flex; flex-direction: column; gap: 0; }
+    .step-item {
+      display: grid; grid-template-columns: 80px 1fr; gap: 0; position: relative;
+    }
+    /* Vertical line */
+    .step-item:not(:last-child) .step-left::after {
+      content: ''; position: absolute;
+      left: 39px; top: 80px; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, rgba(168,85,247,0.5), rgba(168,85,247,0.05));
+    }
+    .step-left {
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: 0; position: relative;
+    }
+    .step-num {
+      width: 58px; height: 58px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #7c3aed, #f59e0b);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.5);
+      z-index: 1;
+    }
+    .step-right {
+      padding: 0.2rem 0 3.5rem 2rem;
+    }
+    .step-badge {
+      display: inline-block; font-size: 0.7rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gold); font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .step-right h3 { font-size: 1.25rem; font-weight: 900; color: #fff; margin-bottom: 0.6rem; }
+    .step-right p { font-size: 0.95rem; color: var(--text-soft); line-height: 1.8; margin-bottom: 1rem; }
+    .step-tip {
+      background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 10px; padding: 0.7rem 1rem;
+      font-size: 0.85rem; color: #fcd34d; display: flex; gap: 0.6rem; align-items: flex-start;
+    }
+    .step-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .step-screen {
+      background: rgba(42,0,80,0.7); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.2rem 1.5rem; margin-top: 1rem;
+      font-size: 0.85rem; color: var(--text-soft);
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .step-screen-icon { font-size: 2rem; flex-shrink: 0; }
+ 
+    /* ── FEATURES DEEP DIVE ── */
+    .features-deep {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 1.5rem; margin-bottom: 3rem;
+    }
+    .feat-deep {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 18px; padding: 1.8rem; backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .feat-deep::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(245,158,11,0.04));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feat-deep:hover { transform: translateY(-4px); border-color: rgba(168,85,247,0.5); }
+    .feat-deep:hover::before { opacity: 1; }
+    .feat-deep-icon { font-size: 2.2rem; margin-bottom: 1rem; display: block; }
+    .feat-deep h3 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; }
+    .feat-deep p { font-size: 0.88rem; color: var(--text-soft); line-height: 1.75; }
+    .feat-tag {
+      display: inline-block; margin-top: 0.8rem;
+      background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+      color: var(--purple-pale); padding: 0.2rem 0.7rem; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+    }
+ 
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 0.8rem; }
+    .faq-item {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.25s;
+    }
+    .faq-item:hover { border-color: rgba(168,85,247,0.45); }
+    .faq-q {
+      width: 100%; background: none; border: none; color: #fff;
+      font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
+      padding: 1.2rem 1.5rem; text-align: left; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    }
+    .faq-arrow { color: var(--gold); font-size: 1.1rem; transition: transform 0.3s; flex-shrink: 0; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s;
+      color: var(--text-soft); font-size: 0.92rem; line-height: 1.8;
+      padding: 0 1.5rem;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding: 0 1.5rem 1.2rem; }
+ 
+    /* ── TECH SPECS ── */
+    .specs-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 3rem;
+    }
+    .spec-card {
+      background: rgba(13,0,32,0.7); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem; text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .spec-val {
+      font-family: 'Cinzel Decorative', serif; font-size: 1.8rem; font-weight: 700;
+      background: linear-gradient(135deg, #c084fc, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .spec-key { font-size: 0.78rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.3rem; font-weight: 700; }
+ 
+    /* ── TIMELINE / ABOUT APP ── */
+    .timeline { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; }
+    .tl-item { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .tl-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+      background: linear-gradient(135deg, #a855f7, #f59e0b);
+      box-shadow: 0 0 12px rgba(168,85,247,0.6);
+    }
+    .tl-content h4 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem; }
+    .tl-content p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.75; }
+ 
+    /* ── CTA BOTTOM ── */
+    .cta-bottom {
+      text-align: center; padding: 5rem 2rem;
+      background: linear-gradient(180deg, transparent, rgba(106,0,184,0.15), transparent);
+      border-top: 1px solid var(--border);
+    }
+    .cta-bottom h2 {
+      font-family: 'Cinzel Decorative', serif; font-size: clamp(1.5rem,3.5vw,2.5rem);
+      background: linear-gradient(90deg, #e9d5ff, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+    .cta-bottom p { color: var(--text-soft); font-size: 1rem; max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.8; }
+    .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, #9333ea, #f59e0b); color: #fff;
+      padding: 0.9rem 2.4rem; border-radius: 50px; font-size: 1rem; font-weight: 800;
+      text-decoration: none; letter-spacing: 0.03em;
+      box-shadow: 0 8px 30px rgba(147,51,234,0.5); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(245,158,11,0.4); }
+    .btn-ghost {
+      background: transparent; color: var(--purple-pale);
+      padding: 0.9rem 2.4rem; border-radius: 50px; font-size: 1rem; font-weight: 700;
+      text-decoration: none; border: 1.5px solid rgba(168,85,247,0.5);
+      transition: background 0.25s, color 0.25s;
+    }
+    .btn-ghost:hover { background: rgba(168,85,247,0.15); color: #fff; }
+ 
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); background: rgba(5,0,15,0.9);
+      backdrop-filter: blur(10px); padding: 2rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-brand {
+      font-family: 'Cinzel Decorative', serif; font-size: 0.95rem;
+      background: linear-gradient(90deg, #c084fc, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-copy { font-size: 0.8rem; color: rgba(216,180,254,0.4); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: rgba(216,180,254,0.55); font-size: 0.82rem; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold-light); }
+    @media(max-width:600px){ footer{flex-direction:column;text-align:center;padding:1.5rem;} }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-fixed"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+ 
+<div class="page-wrap">
+ 
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Logo" onerror="this.style.display='none'"/>
+      <div class="nav-logo-text">Randhawa<br>SkyCast</div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#guide">Guide</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="auth.html" class="nav-cta">Get Started →</a></li>
+    </ul>
+  </nav>
+ 
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> › Learn More
+    </div>
+    <h1>Your Complete Guide<br>to SkyCast</h1>
+    <p>Everything you need to know — from signing up to tracking every corner of the sky. Step by step, clear and simple.</p>
+  </div>
+ 
+  <!-- TABLE OF CONTENTS PILLS -->
+  <div class="toc-bar">
+    <a href="#about"    class="toc-pill">🌐 About SkyCast</a>
+    <a href="#guide"    class="toc-pill">📋 Step-by-Step Guide</a>
+    <a href="#features" class="toc-pill">✨ Features</a>
+    <a href="#specs"    class="toc-pill">📊 App Details</a>
+    <a href="#faq"      class="toc-pill">❓ FAQ</a>
+    <a href="#contact"  class="toc-pill">📬 Contact</a>
+  </div>
+ 
+  <div class="content-wrap">
+ 
+    <!-- ─── ABOUT ─── -->
+    <section id="about">
+      <div class="sec-tag">✦ What is SkyCast</div>
+      <h2 class="sec-title">About Randhawa SkyCast</h2>
+      <p class="sec-body">
+        Randhawa SkyCast is your personal weather companion — built to keep you connected to the sky no matter where you are or where you care about. Whether it's your home city, a distant relative's town, or your next travel destination, SkyCast puts live weather at your fingertips in one beautifully crafted dashboard.
+      </p>
+ 
+      <div class="about-grid">
+        <div class="about-card">
+          <span class="about-icon">🌍</span>
+          <h3>Global Coverage</h3>
+          <p>Weather data from over 200 countries and territories. From Ludhiana to London, SkyCast has you covered with reliable, real-time data.</p>
+        </div>
+        <div class="about-card">
+          <span class="about-icon">👤</span>
+          <h3>Personal Profiles</h3>
+          <p>Your saved locations, preferences, and settings are tied to your personal profile — always synced, always accessible from any device.</p>
+        </div>
+        <div class="about-card">
+          <span class="about-icon">⚡</span>
+          <h3>Real-Time Updates</h3>
+          <p>Weather data refreshes live so you always see the current temperature, wind speed, humidity, and sky conditions at a glance.</p>
+        </div>
+        <div class="about-card">
+          <span class="about-icon">🎨</span>
+          <h3>Beautifully Designed</h3>
+          <p>Every pixel is crafted with care. SkyCast isn't just useful — it's a joy to look at, with a sky-inspired purple-gold aesthetic that matches the mood of the weather.</p>
+        </div>
+      </div>
+ 
+      <!-- App Timeline -->
+      <div class="sec-tag">✦ Our Story</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>The Idea</h4>
+            <p>Randhawa SkyCast was born from a simple frustration — switching between multiple apps just to check the weather in different cities for family and travel. There had to be a better way.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>The Vision</h4>
+            <p>A single dashboard where you add all your important locations — home, family, travel spots — and see live weather for each, saved to your profile and always ready.</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Built with Love</h4>
+            <p>SkyCast is a passion project by the Randhawa team, combining clean technology with a design that feels as dynamic and alive as the sky itself.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <hr class="section-divider"/>
+ 
+    <!-- ─── STEP BY STEP GUIDE ─── -->
+    <section id="guide">
+      <div class="sec-tag">✦ How to Use SkyCast</div>
+      <h2 class="sec-title">Step-by-Step Guide</h2>
+      <p class="sec-body">Follow these steps to get your personalised weather dashboard up and running in minutes.</p>
+ 
+      <div class="steps-list">
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">1</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Getting Started</div>
+            <h3>Visit the SkyCast Homepage</h3>
+            <p>Open your browser and head to the Randhawa SkyCast website. You'll land on the homepage where you can read about the app, see example weather cards, and understand what SkyCast offers.</p>
+            <div class="step-screen">
+              <div class="step-screen-icon">🏠</div>
+              <div>You're on the <strong>Homepage</strong>. Look for the <strong>"Get Started"</strong> button in the top navigation or the <strong>"Check My Weather"</strong> button in the hero section to proceed.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">2</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Account Setup</div>
+            <h3>Create Your Free Profile</h3>
+            <p>Click <strong>Get Started</strong> to open the Sign Up page. Fill in your name, email address, and choose a secure password. Your profile is where all your saved locations and preferences will live.</p>
+            <div class="step-tip">
+              <span class="step-tip-icon">💡</span>
+              <div>Use a real email address — you'll need it to verify your account and recover your password if needed.</div>
+            </div>
+            <div class="step-screen" style="margin-top:0.8rem;">
+              <div class="step-screen-icon">📝</div>
+              <div>Fill in: <strong>Full Name · Email · Password</strong>. Then click <strong>"Create Account"</strong>. You'll receive a confirmation email shortly.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">3</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Email Verification</div>
+            <h3>Verify Your Email</h3>
+            <p>Check your inbox for a verification email from Randhawa SkyCast. Click the confirmation link inside to activate your account. This keeps your data secure and your account protected.</p>
+            <div class="step-tip">
+              <span class="step-tip-icon">📧</span>
+              <div>Can't find the email? Check your spam or junk folder. You can also request a new verification link from the login page.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">4</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Log In</div>
+            <h3>Sign In to Your Dashboard</h3>
+            <p>Once verified, head to the Login page. Enter your email and password. You'll be taken directly to your personal weather dashboard — your home base inside SkyCast.</p>
+            <div class="step-screen">
+              <div class="step-screen-icon">🔐</div>
+              <div>Enter your <strong>Email + Password</strong> and click <strong>"Sign In"</strong>. Tick <em>"Remember Me"</em> so you stay logged in on your device.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">5</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Add Locations</div>
+            <h3>Add Your First Location</h3>
+            <p>On your dashboard, you'll see an <strong>"Add Location"</strong> panel. Type in the name of a city or town, select the state/region, and optionally give it a nickname like "Home" or "Office". Hit <strong>Add This Location</strong>.</p>
+            <div class="step-tip">
+              <span class="step-tip-icon">📍</span>
+              <div>Add multiple locations right away — your home city, a family member's city, your office, or a holiday destination. There's no limit!</div>
+            </div>
+            <div class="step-screen" style="margin-top:0.8rem;">
+              <div class="step-screen-icon">➕</div>
+              <div>Fill in: <strong>City · State · Country · Nickname (optional)</strong> → Click <strong>"Add This Location"</strong>. A new weather card will appear instantly.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">6</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">View Weather</div>
+            <h3>See Live Weather for All Your Locations</h3>
+            <p>Your dashboard now shows a weather card for every location you've added. Each card displays the current temperature, weather condition (sunny, rainy, cloudy etc.), humidity, and wind speed — all updating in real time.</p>
+            <div class="step-screen">
+              <div class="step-screen-icon">🌤️</div>
+              <div>Each card shows: <strong>Temperature · Condition · Humidity · Wind Speed · Feels Like</strong>. Click any card to expand and see the full 7-day forecast.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">7</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Manage Locations</div>
+            <h3>Edit, Remove or Reorder Locations</h3>
+            <p>You can manage all your saved locations from your profile settings. Remove cities you no longer need, rename nicknames, or reorder your cards so your most important locations appear first.</p>
+            <div class="step-tip">
+              <span class="step-tip-icon">✏️</span>
+              <div>Drag and drop your weather cards on the dashboard to reorder them however you like — your preferred layout is automatically saved.</div>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num">8</div>
+          </div>
+          <div class="step-right">
+            <div class="step-badge">Stay Updated</div>
+            <h3>Enable Alerts &amp; Notifications</h3>
+            <p>Head to your profile settings and turn on weather alerts for any of your saved locations. You'll be notified of extreme weather — storms, heatwaves, heavy rain — before they hit.</p>
+            <div class="step-screen">
+              <div class="step-screen-icon">🔔</div>
+              <div>Go to <strong>Profile → Notification Settings</strong> → Toggle alerts <strong>ON</strong> for any location. Choose alert types: Storm, Rain, Heat, Wind.</div>
+            </div>
+          </div>
+        </div>
+ 
+      </div>
+    </section>
+ 
+    <hr class="section-divider"/>
+ 
+    <!-- ─── FEATURES ─── -->
+    <section id="features">
+      <div class="sec-tag">✦ What's Inside</div>
+      <h2 class="sec-title">Full Feature Overview</h2>
+      <p class="sec-body">SkyCast packs a powerful set of weather tools into a clean, easy-to-use interface. Here's everything available to you.</p>
+ 
+      <div class="features-deep">
+        <div class="feat-deep">
+          <span class="feat-deep-icon">🌡️</span>
+          <h3>Live Temperature</h3>
+          <p>See the current temperature in Celsius or Fahrenheit, along with a "feels like" reading that accounts for humidity and wind chill.</p>
+          <span class="feat-tag">Real-Time</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">🗺️</span>
+          <h3>Unlimited Locations</h3>
+          <p>Add as many cities as you want. Each location is stored in your personal profile and synced across devices — no limits.</p>
+          <span class="feat-tag">Profile Sync</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">📅</span>
+          <h3>7-Day Forecast</h3>
+          <p>Tap any weather card to expand and see the full week ahead — daily highs, lows, and expected conditions for smart planning.</p>
+          <span class="feat-tag">Extended Forecast</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">⏱️</span>
+          <h3>Hourly Breakdown</h3>
+          <p>Need to know if it'll rain at 3pm? The hourly view shows you temperature and conditions hour by hour for the next 24 hours.</p>
+          <span class="feat-tag">24-Hour View</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">💧</span>
+          <h3>Humidity &amp; Wind</h3>
+          <p>Every card shows humidity percentage and wind speed so you know exactly what the air will feel like when you step outside.</p>
+          <span class="feat-tag">Detailed Metrics</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">🔔</span>
+          <h3>Weather Alerts</h3>
+          <p>Get notified before storms, heatwaves, fog, or heavy rainfall affect any of your saved locations. Stay ahead of the sky.</p>
+          <span class="feat-tag">Push Notifications</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">🌙</span>
+          <h3>Day &amp; Night Mode</h3>
+          <p>The dashboard intelligently shifts its visual theme based on local time — warm tones by day, cool deep purples at night.</p>
+          <span class="feat-tag">Adaptive UI</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">🔒</span>
+          <h3>Secure &amp; Private</h3>
+          <p>Your profile and saved data are encrypted and stored securely in our database. Your weather preferences are yours alone.</p>
+          <span class="feat-tag">Data Security</span>
+        </div>
+        <div class="feat-deep">
+          <span class="feat-deep-icon">📱</span>
+          <h3>Mobile Friendly</h3>
+          <p>SkyCast is fully responsive — works beautifully on phones, tablets, and desktops without needing to install any app.</p>
+          <span class="feat-tag">All Devices</span>
+        </div>
+      </div>
+    </section>
+ 
+    <hr class="section-divider"/>
+ 
+    <!-- ─── SPECS ─── -->
+    <section id="specs">
+      <div class="sec-tag">✦ App Details</div>
+      <h2 class="sec-title">Technical Overview</h2>
+      <p class="sec-body">Here's a quick look at the scale and capability of the SkyCast platform.</p>
+ 
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="spec-val">200+</div>
+          <div class="spec-key">Countries Covered</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">Live</div>
+          <div class="spec-key">Data Refresh Rate</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">∞</div>
+          <div class="spec-key">Locations Per User</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">7</div>
+          <div class="spec-key">Days Forecast</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">24hr</div>
+          <div class="spec-key">Hourly Breakdown</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">Free</div>
+          <div class="spec-key">To Get Started</div>
+        </div>
+      </div>
+ 
+      <div class="about-grid">
+        <div class="about-card">
+          <span class="about-icon">🗄️</span>
+          <h3>Your Own Database</h3>
+          <p>All user profiles, saved locations, and preferences are stored in a secure, dedicated database — fast, reliable, and always available.</p>
+        </div>
+        <div class="about-card">
+          <span class="about-icon">🌐</span>
+          <h3>Weather Data Source</h3>
+          <p>SkyCast pulls data from trusted global weather APIs, ensuring accuracy and reliability across all locations, 24 hours a day.</p>
+        </div>
+      </div>
+    </section>
+ 
+    <hr class="section-divider"/>
+ 
+    <!-- ─── FAQ ─── -->
+    <section id="faq">
+      <div class="sec-tag">✦ Common Questions</div>
+      <h2 class="sec-title">Frequently Asked Questions</h2>
+      <p class="sec-body">Got a question? Here are the most common ones we hear from new SkyCast users.</p>
+ 
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q">
+            Is Randhawa SkyCast free to use?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Yes! Creating an account and using SkyCast is completely free. You can add unlimited locations and view live weather data at no cost. Premium features may be introduced in the future, but the core experience will always remain free.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            How many locations can I add to my profile?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">There is no limit! You can add as many cities, towns, and regions as you like. Each one appears as its own weather card on your dashboard, and all locations are saved to your profile permanently.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            How often is the weather data updated?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Weather data on SkyCast refreshes in real time. Every time you load your dashboard or refresh the page, you get the most current weather information available for all your saved locations.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Can I use SkyCast on my phone?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Absolutely. SkyCast is fully responsive and designed to work beautifully on smartphones, tablets, and desktop computers. No app installation is required — just open it in your browser.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Is my personal data safe?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Yes. Your profile information, email, and saved locations are stored securely in an encrypted database. We never share or sell your personal data to any third party. Your privacy is our priority.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            What if a city I search for doesn't show up?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Try entering the nearest larger city or the official spelling of the city name. You can also include the country name for more accuracy. If a location is still missing, please use the Contact form and we'll look into adding it.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q">
+            Can I delete my account?
+            <span class="faq-arrow">▼</span>
+          </button>
+          <div class="faq-a">Yes. You can delete your account at any time from your Profile Settings. All your data, including saved locations and preferences, will be permanently removed from our database.</div>
+        </div>
+      </div>
+    </section>
+ 
+    <hr class="section-divider"/>
+ 
+    <!-- ─── CONTACT ─── -->
+    <section id="contact">
+      <div class="sec-tag">✦ Get In Touch</div>
+      <h2 class="sec-title">Contact &amp; Support</h2>
+      <p class="sec-body">Have a question that isn't answered above? Want to report a bug, suggest a feature, or just say hello? We'd love to hear from you.</p>
+ 
+      <div style="
+        background: linear-gradient(135deg, rgba(106,0,184,0.3), rgba(245,158,11,0.1));
+        border: 1px solid rgba(168,85,247,0.35);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+        backdrop-filter: blur(14px);
+        max-width: 620px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+      ">
+        <!-- glow blob -->
+        <div style="
+          position:absolute; width:300px; height:300px; border-radius:50%;
+          background: radial-gradient(rgba(168,85,247,0.2), transparent 70%);
+          top:50%; left:50%; transform:translate(-50%,-50%);
+          pointer-events:none;
+        "></div>
+ 
+        <div style="font-size:3.5rem; margin-bottom:1.2rem; filter:drop-shadow(0 4px 16px rgba(245,158,11,0.5));">📬</div>
+ 
+        <h3 style="
+          font-family:'Cinzel Decorative',serif; font-size:1.4rem;
+          background:linear-gradient(90deg,#e9d5ff,#fcd34d);
+          -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+          margin-bottom:0.8rem;
+        ">We're Here to Help</h3>
+ 
+        <p style="color:var(--text-soft); font-size:0.97rem; line-height:1.8; max-width:420px; margin:0 auto 2rem;">
+          For support, feedback, bug reports, or feature requests — head over to our dedicated <strong style="color:#fcd34d;">Contact Page</strong> and we'll get back to you as soon as possible.
+        </p>
+ 
+        <a href="contact.html" style="
+          display: inline-flex; align-items: center; gap: 0.6rem;
+          background: linear-gradient(135deg, #9333ea, #f59e0b);
+          color: #fff; padding: 0.9rem 2.4rem; border-radius: 50px;
+          font-family:'Nunito',sans-serif; font-size:1rem; font-weight:800;
+          text-decoration:none; letter-spacing:0.03em;
+          box-shadow: 0 8px 28px rgba(147,51,234,0.45);
+          transition: transform 0.2s, box-shadow 0.2s;
+        " onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 36px rgba(245,158,11,0.4)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 28px rgba(147,51,234,0.45)'">
+          ✉️ &nbsp; Visit the Contact Page
+        </a>
+ 
+        <p style="margin-top:1.4rem; font-size:0.8rem; color:rgba(216,180,254,0.45);">
+          Typical response time: within 24 hours
+        </p>
+      </div>
+    </section>
+ 
+  </div><!-- end content-wrap -->
+ 
+  <!-- CTA BOTTOM -->
+  <div class="cta-bottom">
+    <h2>Ready to Start Watching the Sky?</h2>
+    <p>Create your free SkyCast profile today and add all your important locations in minutes.</p>
+    <div class="btn-row">
+      <a href="dashboard.html" class="btn-primary">🌤 Get Started Free</a>
+      <a href="index.html" class="btn-ghost">← Back to Home</a>
+    </div>
+  </div>
+ 
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">Randhawa SkyCast</div>
+    <div class="footer-copy">© 2025 Randhawa SkyCast · All rights reserved</div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy & Terms</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </footer>
+ 
+</div><!-- page-wrap -->
+ 
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+ 
+  // Scroll-reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.12 });
+ 
+  document.querySelectorAll(
+    '.about-card, .step-item, .feat-deep, .spec-card, .tl-item, .faq-item'
+  ).forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(28px)';
+    el.style.transition = `opacity 0.55s ease ${i * 0.05}s, transform 0.55s ease ${i * 0.05}s`;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
