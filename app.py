@@ -97,6 +97,8 @@ def static_files(filename):
 @app.route('/contact', methods=['POST'])
 def contact():
     data = request.get_json()
+    print("📩 Incoming data:", data)
+
     for f in ['name','email','subject','message']:
         if not data.get(f,'').strip():
             return jsonify({'error': f'Missing: {f}'}), 400
