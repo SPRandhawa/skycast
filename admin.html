@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – Randhawa SkyCast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-deep:  #0d0020;
+      --purple-light: #a855f7;
+      --purple-pale:  #d8b4fe;
+      --gold:         #f59e0b;
+      --gold-light:   #fcd34d;
+      --text-soft:    #e9d5ff;
+      --card-bg:      rgba(42,0,80,0.6);
+      --border:       rgba(168,85,247,0.25);
+      --green:        #34d399;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Nunito', sans-serif; background: var(--purple-deep); color: #fff; overflow-x: hidden; min-height: 100vh; }
+ 
+    .bg-fixed { position: fixed; inset: 0; z-index: 0; background: linear-gradient(160deg, #08000f 0%, #1e0040 40%, #3a0075 70%, #5c2800 90%, #8a4000 100%); }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 1; }
+    .orb-1 { width: 500px; height: 500px; background: radial-gradient(#6d28d940, transparent 70%); top: -100px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(#f59e0b22, transparent 70%); bottom: -80px; right: -80px; }
+    .page-wrap { position: relative; z-index: 10; min-height: 100vh; }
+ 
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+ 
+    /* ═══ LOGIN ═══ */
+    #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .login-box {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
+      padding: 3rem 2.5rem; width: 100%; max-width: 420px;
+      backdrop-filter: blur(18px); text-align: center;
+      box-shadow: 0 24px 64px rgba(42,0,80,0.6); animation: fadeUp 0.7s ease both;
+    }
+    .login-icon { font-size: 3.2rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 14px rgba(168,85,247,0.8)); animation: float 3s ease-in-out infinite; display: block; }
+    .login-box h2 { font-family:'Cinzel Decorative',serif; font-size:1.4rem; background:linear-gradient(90deg,#e9d5ff,#fcd34d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:0.3rem; }
+    .login-sub { color:var(--text-soft); font-size:0.88rem; margin-bottom:2rem; display:block; }
+    .login-label { font-size:0.75rem; font-weight:800; color:var(--purple-pale); letter-spacing:0.1em; text-transform:uppercase; display:block; margin-bottom:0.45rem; text-align:left; }
+    .login-input { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid rgba(168,85,247,0.3); border-radius:12px; padding:0.85rem 1.1rem; color:#fff; font-family:'Nunito',sans-serif; font-size:0.95rem; outline:none; transition:border-color 0.25s,background 0.25s; margin-bottom:1.1rem; }
+    .login-input:focus { border-color:var(--purple-light); background:rgba(168,85,247,0.1); }
+    .login-btn { width:100%; background:linear-gradient(135deg,#7c3aed,#f59e0b); color:#fff; border:none; border-radius:12px; padding:0.95rem; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:800; cursor:pointer; box-shadow:0 6px 22px rgba(124,58,237,0.4); transition:transform 0.2s; }
+    .login-btn:hover { transform:translateY(-2px); }
+    .login-error { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:10px; padding:0.7rem 1rem; font-size:0.85rem; margin-bottom:1rem; display:none; text-align:left; }
+ 
+    /* ═══ ADMIN PANEL ═══ */
+    #adminPanel { display: none; flex-direction: column; min-height: 100vh; }
+ 
+    /* Topbar */
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:0.9rem 2rem; background:rgba(8,0,20,0.75); border-bottom:1px solid var(--border); backdrop-filter:blur(14px); position:sticky; top:0; z-index:100; }
+    .brand-text { font-family:'Cinzel Decorative',serif; font-size:1rem; background:linear-gradient(90deg,#d8b4fe,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .admin-tag { background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:var(--gold-light); border-radius:20px; padding:0.2rem 0.8rem; font-size:0.7rem; font-weight:800; letter-spacing:0.1em; margin-left:0.8rem; }
+    .logout-btn { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; border-radius:20px; padding:0.35rem 1rem; font-size:0.82rem; font-weight:700; cursor:pointer; transition:background 0.2s; }
+    .logout-btn:hover { background:rgba(239,68,68,0.25); }
+ 
+    /* Stats */
+    .stats-row { display:flex; gap:1rem; padding:1.5rem 2rem; flex-wrap:wrap; }
+    .stat-box { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:1rem 1.6rem; flex:1; min-width:130px; backdrop-filter:blur(10px); text-align:center; }
+    .stat-val { font-family:'Cinzel Decorative',serif; font-size:1.9rem; background:linear-gradient(135deg,#c084fc,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .stat-lbl { font-size:0.72rem; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.1em; font-weight:700; margin-top:0.2rem; }
+ 
+    /* Filters */
+    .filters { display:flex; gap:0.6rem; padding:0 2rem 1.2rem; flex-wrap:wrap; align-items:center; }
+    .f-btn { background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.25); color:var(--text-soft); border-radius:20px; padding:0.35rem 1rem; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .f-btn:hover { background:rgba(168,85,247,0.22); color:#fff; }
+    .f-btn.active { background:rgba(245,158,11,0.18); border-color:rgba(245,158,11,0.45); color:var(--gold-light); }
+    .search-box { background:rgba(255,255,255,0.06); border:1px solid rgba(168,85,247,0.25); border-radius:20px; padding:0.35rem 1rem; color:#fff; font-family:'Nunito',sans-serif; font-size:0.85rem; outline:none; width:210px; transition:border-color 0.2s; }
+    .search-box:focus { border-color:var(--purple-light); }
+    .search-box::placeholder { color:rgba(216,180,254,0.35); }
+ 
+    /* Messages */
+    .messages { padding:0 2rem 4rem; display:flex; flex-direction:column; gap:1.2rem; }
+    .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-soft); }
+    .empty-icon { font-size:3rem; display:block; margin-bottom:1rem; opacity:0.4; }
+ 
+    /* Message card */
+    .msg-card { background:var(--card-bg); border:1px solid var(--border); border-radius:18px; overflow:hidden; backdrop-filter:blur(12px); transition:border-color 0.25s; animation:fadeUp 0.4s ease both; }
+    .msg-card.unread  { border-left:3px solid var(--purple-light); }
+    .msg-card.replied { border-left:3px solid var(--green); }
+    .msg-card:hover   { border-color:rgba(168,85,247,0.45); }
+ 
+    /* Card header */
+    .card-head { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 1.5rem; cursor:pointer; gap:1rem; transition:background 0.2s; }
+    .card-head:hover { background:rgba(168,85,247,0.06); }
+    .card-head-left { display:flex; align-items:center; gap:1rem; flex:1; min-width:0; }
+    .priority-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; box-shadow:0 0 8px currentColor; }
+    .priority-dot.high   { background:#f87171; color:#f87171; }
+    .priority-dot.medium { background:#fcd34d; color:#fcd34d; }
+    .priority-dot.low    { background:#86efac; color:#86efac; }
+    .sender-name  { font-weight:800; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sender-email { font-size:0.78rem; color:rgba(216,180,254,0.55); margin-top:1px; }
+    .card-subject { flex:1; font-size:0.9rem; color:var(--text-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .card-head-right { display:flex; align-items:center; gap:0.8rem; flex-shrink:0; }
+    .status-badge { font-size:0.72rem; font-weight:800; letter-spacing:0.08em; padding:0.2rem 0.7rem; border-radius:20px; text-transform:uppercase; }
+    .status-badge.unread  { background:rgba(168,85,247,0.15); color:var(--purple-pale); border:1px solid rgba(168,85,247,0.3); }
+    .status-badge.replied { background:rgba(52,211,153,0.12); color:#6ee7b7; border:1px solid rgba(52,211,153,0.3); }
+    .card-date   { font-size:0.75rem; color:rgba(216,180,254,0.4); }
+    .card-toggle { color:var(--gold); font-size:1rem; transition:transform 0.3s; }
+    .msg-card.open .card-toggle { transform:rotate(180deg); }
+ 
+    /* Card body */
+    .card-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
+    .msg-card.open .card-body { max-height:1200px; }
+    .card-body-inner { padding:0 1.5rem 1.5rem; border-top:1px solid var(--border); }
+ 
+    .msg-label { font-size:0.72rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin:1.2rem 0 0.5rem; }
+    .msg-text  { background:rgba(13,0,32,0.5); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; font-size:0.9rem; color:var(--text-soft); line-height:1.8; white-space:pre-line; }
+ 
+    .prev-reply { background:rgba(52,211,153,0.07); border:1px solid rgba(52,211,153,0.25); border-radius:10px; padding:1rem 1.2rem; margin-top:0.5rem; }
+    .prev-reply-header { font-size:0.72rem; font-weight:800; color:var(--green); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem; }
+    .prev-reply-text   { font-size:0.9rem; color:#a7f3d0; line-height:1.8; white-space:pre-line; }
+ 
+    .reply-area { width:100%; background:rgba(255,255,255,0.05); border:1.5px solid rgba(168,85,247,0.3); border-radius:12px; padding:0.85rem 1.1rem; color:#fff; font-family:'Nunito',sans-serif; font-size:0.92rem; outline:none; resize:vertical; min-height:100px; line-height:1.7; transition:border-color 0.25s,background 0.25s; margin-top:0.5rem; }
+    .reply-area:focus { border-color:var(--purple-light); background:rgba(168,85,247,0.08); }
+    .reply-area::placeholder { color:rgba(216,180,254,0.35); }
+ 
+    .reply-btn { margin-top:0.8rem; background:linear-gradient(135deg,#7c3aed,#34d399); color:#fff; border:none; border-radius:10px; padding:0.75rem 2rem; font-family:'Nunito',sans-serif; font-size:0.9rem; font-weight:800; cursor:pointer; box-shadow:0 4px 18px rgba(124,58,237,0.35); transition:transform 0.2s; display:inline-flex; align-items:center; gap:0.5rem; }
+    .reply-btn:hover { transform:translateY(-2px); }
+    .reply-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+ 
+    .reply-sent  { display:none; align-items:center; gap:0.6rem; margin-top:0.8rem; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3); border-radius:10px; padding:0.65rem 1rem; font-size:0.85rem; font-weight:700; color:#6ee7b7; }
+    .reply-error { display:none; align-items:center; gap:0.6rem; margin-top:0.8rem; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.28); border-radius:10px; padding:0.65rem 1rem; font-size:0.85rem; font-weight:700; color:#fca5a5; }
+ 
+    @media(max-width:700px){
+      .topbar,.stats-row,.filters,.messages { padding-left:1rem; padding-right:1rem; }
+      .card-subject { display:none; }
+    }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-fixed"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+ 
+<div class="page-wrap">
+ 
+  <!-- ═══ LOGIN SCREEN ═══ -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <span class="login-icon">🔐</span>
+      <h2>Admin Login</h2>
+      <span class="login-sub">Enter your password to access the SkyCast admin panel</span>
+ 
+      <div class="login-error" id="loginError">❌ Wrong password. Please try again.</div>
+ 
+      <label class="login-label" for="adminPass">Admin Password</label>
+      <input class="login-input" type="password" id="adminPass" placeholder="Enter your admin password…"/>
+      <button class="login-btn" onclick="doLogin()">🔓 Login to Admin Panel</button>
+    </div>
+  </div>
+ 
+  <!-- ═══ ADMIN PANEL ═══ -->
+  <div id="adminPanel">
+ 
+    <div class="topbar">
+      <div>
+        <span class="brand-text">Randhawa SkyCast</span>
+        <span class="admin-tag">⚙️ ADMIN PANEL</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span style="font-size:0.8rem;color:rgba(216,180,254,0.45);" id="lastRefresh"></span>
+        <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+      </div>
+    </div>
+ 
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val" id="statTotal">—</div><div class="stat-lbl">Total Messages</div></div>
+      <div class="stat-box"><div class="stat-val" id="statUnread">—</div><div class="stat-lbl">Unread</div></div>
+      <div class="stat-box"><div class="stat-val" id="statReplied">—</div><div class="stat-lbl">Replied</div></div>
+      <div class="stat-box"><div class="stat-val" id="statHigh">—</div><div class="stat-lbl">High Priority</div></div>
+    </div>
+ 
+    <div class="filters">
+      <button class="f-btn active" onclick="setFilter(this,'all')">📋 All</button>
+      <button class="f-btn"        onclick="setFilter(this,'unread')">🔵 Unread</button>
+      <button class="f-btn"        onclick="setFilter(this,'replied')">✅ Replied</button>
+      <button class="f-btn"        onclick="setFilter(this,'high')">🔴 High Priority</button>
+      <input  class="search-box" type="text" id="searchBox" placeholder="🔍 Search name, email, subject…" oninput="renderMessages()"/>
+      <button class="f-btn" onclick="loadMessages()" style="margin-left:auto;">🔄 Refresh</button>
+    </div>
+ 
+    <div class="messages" id="messagesList"></div>
+ 
+  </div>
+ 
+</div>
+ 
+<script>
+  let allMessages   = [];
+  let currentFilter = 'all';
+ 
+  // Enter key on password
+  document.getElementById('adminPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+ 
+  // ── LOGIN
+  async function doLogin() {
+    const pass = document.getElementById('adminPass').value;
+    const err  = document.getElementById('loginError');
+    const btn  = document.querySelector('.login-btn');
+    btn.textContent = '⏳ Checking…'; btn.disabled = true;
+    err.style.display = 'none';
+    try {
+      const res = await fetch('/admin/login', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ password: pass })
+      });
+      if (res.ok) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display  = 'flex';
+        loadMessages();
+      } else {
+        err.style.display = 'block';
+        btn.textContent = '🔓 Login to Admin Panel'; btn.disabled = false;
+      }
+    } catch {
+      err.textContent = '❌ Server error. Is Flask running?';
+      err.style.display = 'block';
+      btn.textContent = '🔓 Login to Admin Panel'; btn.disabled = false;
+    }
+  }
+ 
+  // ── LOGOUT
+  function doLogout() {
+    document.getElementById('adminPanel').style.display  = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPass').value = '';
+    allMessages = [];
+  }
+ 
+  // ── LOAD MESSAGES
+  async function loadMessages() {
+    try {
+      const res = await fetch('/admin/get-messages');
+      if (res.status === 401) { doLogout(); return; }
+      allMessages = await res.json();
+      updateStats();
+      renderMessages();
+      document.getElementById('lastRefresh').textContent = 'Refreshed: ' + new Date().toLocaleTimeString();
+    } catch(e) { console.error(e); }
+  }
+ 
+  // ── STATS
+  function updateStats() {
+    document.getElementById('statTotal').textContent   = allMessages.length;
+    document.getElementById('statUnread').textContent  = allMessages.filter(m => m.status==='unread').length;
+    document.getElementById('statReplied').textContent = allMessages.filter(m => m.status==='replied').length;
+    document.getElementById('statHigh').textContent    = allMessages.filter(m => m.priority==='high').length;
+  }
+ 
+  // ── FILTER
+  function setFilter(btn, filter) {
+    document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = filter;
+    renderMessages();
+  }
+ 
+  // ── RENDER
+  function renderMessages() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    let msgs = allMessages;
+    if (currentFilter === 'unread')  msgs = msgs.filter(m => m.status==='unread');
+    if (currentFilter === 'replied') msgs = msgs.filter(m => m.status==='replied');
+    if (currentFilter === 'high')    msgs = msgs.filter(m => m.priority==='high');
+    if (q) msgs = msgs.filter(m =>
+      m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q) ||
+      m.subject.toLowerCase().includes(q) || m.message.toLowerCase().includes(q)
+    );
+    const c = document.getElementById('messagesList');
+    if (!msgs.length) {
+      c.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><p style="opacity:0.5">No messages found.</p></div>`;
+      return;
+    }
+    c.innerHTML = msgs.map(buildCard).join('');
+  }
+ 
+  // ── BUILD CARD
+  function buildCard(m) {
+    const pLabels = { high:'🔴 High', medium:'🟡 Medium', low:'🟢 Low' };
+    const replyBlock = m.reply
+      ? `<div class="msg-label">✅ Your Previous Reply <span style="color:rgba(216,180,254,0.4);font-weight:400;text-transform:none;">(sent ${m.replied_at||''})</span></div>
+         <div class="prev-reply"><div class="prev-reply-text">${esc(m.reply)}</div></div>
+         <div class="msg-label">✏️ Update Reply</div>`
+      : `<div class="msg-label">✏️ Write Your Reply</div>`;
+    return `
+    <div class="msg-card ${m.status}" id="card-${m.id}">
+      <div class="card-head" onclick="toggleCard(${m.id})">
+        <div class="card-head-left">
+          <div class="priority-dot ${m.priority}"></div>
+          <div>
+            <div class="sender-name">${esc(m.name)}</div>
+            <div class="sender-email">${esc(m.email)}</div>
+          </div>
+          <div class="card-subject">${esc(m.subject)}</div>
+        </div>
+        <div class="card-head-right">
+          <span class="status-badge ${m.status}">${m.status==='replied'?'✅ Replied':'🔵 Unread'}</span>
+          <span class="card-date">${(m.submitted_at||'').split(' ')[0]}</span>
+          <span class="card-toggle">▼</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin:1rem 0 0.5rem;font-size:0.82rem;color:rgba(216,180,254,0.6);">
+            <span>📋 <strong style="color:var(--purple-pale);">Subject:</strong> ${esc(m.subject)}</span>
+            <span>⚡ <strong style="color:var(--purple-pale);">Priority:</strong> ${pLabels[m.priority]||m.priority}</span>
+            <span>🕐 <strong style="color:var(--purple-pale);">Sent:</strong> ${m.submitted_at||'—'}</span>
+          </div>
+          <div class="msg-label">📨 Their Message</div>
+          <div class="msg-text">${esc(m.message)}</div>
+          ${replyBlock}
+          <textarea class="reply-area" id="reply-${m.id}" placeholder="Type your reply or solution here…">${m.reply?esc(m.reply):''}</textarea>
+          <div>
+            <button class="reply-btn" id="rbtn-${m.id}" onclick="sendReply(${m.id})">✉️ Send Reply &amp; Save</button>
+          </div>
+          <div class="reply-sent"  id="rsent-${m.id}">✅ Reply saved in database and emailed to ${esc(m.email)}!</div>
+          <div class="reply-error" id="rerr-${m.id}">❌ Something went wrong. Please try again.</div>
+        </div>
+      </div>
+    </div>`;
+  }
+ 
+  // ── TOGGLE OPEN/CLOSE
+  function toggleCard(id) {
+    document.getElementById(`card-${id}`).classList.toggle('open');
+  }
+ 
+  // ── SEND REPLY
+  async function sendReply(id) {
+    const replyText = document.getElementById(`reply-${id}`).value.trim();
+    const btn  = document.getElementById(`rbtn-${id}`);
+    const sent = document.getElementById(`rsent-${id}`);
+    const err  = document.getElementById(`rerr-${id}`);
+    sent.style.display = 'none'; err.style.display = 'none';
+ 
+    if (!replyText) {
+      err.textContent = '❌ Please write a reply first.';
+      err.style.display = 'flex'; return;
+    }
+    btn.disabled = true; btn.innerHTML = '⏳ Sending…';
+ 
+    try {
+      const res = await fetch('/admin/reply', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ id, reply: replyText })
+      });
+      if (res.ok) {
+        sent.style.display = 'flex';
+        btn.innerHTML = '✅ Reply Sent!';
+        const idx = allMessages.findIndex(m => m.id === id);
+        if (idx !== -1) { allMessages[idx].reply = replyText; allMessages[idx].status = 'replied'; }
+        updateStats();
+        const card = document.getElementById(`card-${id}`);
+        card.classList.remove('unread'); card.classList.add('replied');
+        card.querySelector('.status-badge').textContent  = '✅ Replied';
+        card.querySelector('.status-badge').className    = 'status-badge replied';
+        setTimeout(() => { btn.innerHTML = '✉️ Send Reply & Save'; btn.disabled = false; }, 2500);
+      } else {
+        err.style.display = 'flex';
+        btn.innerHTML = '✉️ Send Reply & Save'; btn.disabled = false;
+      }
+    } catch {
+      err.style.display = 'flex';
+      btn.innerHTML = '✉️ Send Reply & Save'; btn.disabled = false;
+    }
+  }
+ 
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
