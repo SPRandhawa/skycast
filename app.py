@@ -391,7 +391,8 @@ def get_weather():
     except Exception as e:
         print(f"⚠️ Weather error: {e}")
         return jsonify({'error': 'Failed to fetch weather data'}), 500
- 
+ init_db()  # ← ADD THIS LINE
+
 if __name__ == '__main__':
     init_db()
     print("🌤  Randhawa SkyCast → http://localhost:5000")
