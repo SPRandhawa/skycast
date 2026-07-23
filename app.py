@@ -7,16 +7,13 @@ import os
 import secrets
 import requests as http_requests
 from datetime import datetime, timedelta
-
-app = Flask(__name__)
-
-@app.route("/ping")
-def ping():
-    return "OK"
  
 load_dotenv()  # loads .env file when running locally
  
 app = Flask(__name__, static_folder='.')
+@app.route("/ping")
+def ping():
+    return "OK"
 app.secret_key = os.environ.get('SECRET_KEY', 'skycast-local-dev-key')
  
 app.config['MAIL_SERVER']         = 'smtp.gmail.com'
