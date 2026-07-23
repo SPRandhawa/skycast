@@ -7,6 +7,12 @@ import os
 import secrets
 import requests as http_requests
 from datetime import datetime, timedelta
+
+app = Flask(__name__)
+
+@app.route("/ping")
+def ping():
+    return "OK"
  
 load_dotenv()  # loads .env file when running locally
  
