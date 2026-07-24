@@ -14,6 +14,10 @@ app = Flask(__name__, static_folder='.')
 @app.route("/ping")
 def ping():
     return "OK"
+@app.route("/robots.txt")
+def robots():
+    return "User-agent: *\nAllow: /", 200, {'Content-Type': 'text/plain'}
+ 
 app.secret_key = os.environ.get('SECRET_KEY', 'skycast-local-dev-key')
  
 app.config['MAIL_SERVER']         = 'smtp.gmail.com'
