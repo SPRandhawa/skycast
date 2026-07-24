@@ -9,7 +9,35 @@ import requests as http_requests
 from datetime import datetime, timedelta
  
 load_dotenv()  # loads .env file when running locally
- 
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://randhawa-skycast.onrender.com/</loc>
+  </url>
+
+  <url>
+    <loc>https://randhawa-skycast.onrender.com/index.html</loc>
+  </url>
+
+  <url>
+    <loc>https://randhawa-skycast.onrender.com/contact.html</loc>
+  </url>
+
+  <url>
+    <loc>https://randhawa-skycast.onrender.com/learn.html</loc>
+  </url>
+
+  <url>
+    <loc>https://randhawa-skycast.onrender.com/privacy.html</loc>
+  </url>
+
+</urlset>
+''', 200, {'Content-Type': 'application/xml'}
+
 app = Flask(__name__, static_folder='.')
 @app.route("/ping")
 def ping():
